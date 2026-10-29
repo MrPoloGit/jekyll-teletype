@@ -17,6 +17,8 @@ extra_js:
 
 # Exhibits
 
+[← Back to the main page]({{ "/" | relative_url }}){: .apply}
+
 Ported, one at a time, from the source page's bespoke animations/diagrams —
 see "Exhibits porting roadmap" in `plan.md` for the full list and status.
 These are page-specific: each one's CSS/JS is declared in this page's own

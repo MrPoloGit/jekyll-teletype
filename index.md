@@ -9,6 +9,8 @@ description: Example page for the printed-transcript Jekyll theme.
 Teams of 1 or 2 get 60 minutes to build a pokerbot from scratch.
 {: .notice}
 
+[See the ported exhibits →]({{ "/exhibits/" | relative_url }}){: .apply}
+
 ## Schedule
 
 Applications open
