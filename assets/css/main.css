@@ -24,12 +24,17 @@ html { -webkit-text-size-adjust: 100%; }
   --red: {{ light.red }};
   --mono: {{ c.mono_font }};
   --lh: {{ c.line_height }};
+  --gutter-width: {{ gw }}ch;
+  --gutter-offset: {{ go }}ch;
 }
 
+html { overflow-x: hidden; }
 body {
   margin: 0; background: var(--paper); color: var(--ink);
   font-family: var(--mono); font-size: 15px; line-height: var(--lh);
+  overflow-x: hidden;
 }
+img, svg, video, canvas { max-width: 100%; }
 a { color: inherit; }
 b, strong, th, h1, h2, h3, h4, h5, h6 { font-weight: 400; }
 
@@ -45,7 +50,7 @@ b, strong, th, h1, h2, h3, h4, h5, h6 { font-weight: 400; }
 .sheet {
   max-width: {{ c.max_width_ch }}ch; margin: 0 auto;
 {% if c.gutter.show %}
-  padding: 0 24px 0 calc({{ go }}ch + 2ch);
+  padding: 0 24px 0 calc(var(--gutter-offset) + 2ch);
 {% else %}
   padding: 0 24px;
 {% endif %}
@@ -58,7 +63,7 @@ b, strong, th, h1, h2, h3, h4, h5, h6 { font-weight: 400; }
 
 {% if c.gutter.show %}
 .sheet > :not(dl)::before, .sheet dl > dt::before {
-  content: counter(ln); position: absolute; left: -{{ go }}ch; width: {{ gw }}ch;
+  content: counter(ln); position: absolute; left: calc(var(--gutter-offset) * -1); width: var(--gutter-width);
   text-align: right; font-size: 10px; color: var(--gutter); top: .55em;
 }
 {% endif %}
@@ -179,5 +184,20 @@ b, strong, th, h1, h2, h3, h4, h5, h6 { font-weight: 400; }
 .doc .banner { display: inline-block; padding: 0 1.5ch; }
 .doc .banner.amber { background: var(--amber); color: var(--paper); }
 .doc .banner.green { background: var(--green); color: var(--ink); }
+
+/* ---- mobile: shrink the gutter and side padding so the numbered column
+   doesn't eat the little width a phone screen has to give ---- */
+@media (max-width: 600px) {
+  :root { --gutter-width: 2ch; --gutter-offset: 2.5ch; }
+  body { font-size: 14px; }
+  .doc { padding: 32px 0 0; }
+  .sheet { padding-right: 12px; }
+  .wide { padding: 0 12px; }
+  .sheet dl.kv { grid-template-columns: 14ch 1fr; }
+}
+
+@media (max-width: 400px) {
+  :root { --gutter-width: 0ch; --gutter-offset: 1.2ch; }
+}
 
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
