@@ -8,7 +8,26 @@
 <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
 
+{% if site.theme_config.favicon and site.theme_config.favicon != "" %}
+{% assign favicon_ext = site.theme_config.favicon | split: '.' | last | downcase %}
+{% case favicon_ext %}
+  {% when 'svg' %}{% assign favicon_type = 'image/svg+xml' %}
+  {% when 'png' %}{% assign favicon_type = 'image/png' %}
+  {% when 'ico' %}{% assign favicon_type = 'image/x-icon' %}
+  {% when 'jpg' or 'jpeg' %}{% assign favicon_type = 'image/jpeg' %}
+  {% else %}{% assign favicon_type = '' %}
+{% endcase %}
+<link rel="icon"{% if favicon_type != '' %} type="{{ favicon_type }}"{% endif %} href="{{ site.theme_config.favicon | relative_url }}">
+{% endif %}
+
+{% comment %} Per-page extras (e.g. a ported exhibit's own CSS/JS) — NOT loaded
+   site-wide, only on pages whose front matter declares them. {% endcomment %}
+{% if page.extra_css %}{% for f in page.extra_css %}<link rel="stylesheet" href="{{ f | relative_url }}">
+{% endfor %}{% endif %}
+
 <script>window.THEME = { apiBase: {{ site.theme_config.api.base_url | jsonify }} };</script>
 <script src="{{ '/assets/js/api.js' | relative_url }}" defer></script>
 <script src="{{ '/assets/js/bind.js' | relative_url }}" defer></script>
 <script src="{{ '/assets/js/forms.js' | relative_url }}" defer></script>
+{% if page.extra_js %}{% for f in page.extra_js %}<script src="{{ f | relative_url }}" defer></script>
+{% endfor %}{% endif %}

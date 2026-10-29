@@ -119,6 +119,15 @@ b, strong, th, h1, h2, h3, h4, h5, h6 { font-weight: 400; }
 }
 .screen:last-child { padding-bottom: calc(var(--lh) * 3em); }
 
+/* ---- wide breakout: ::: wide ... ::: in markdown ----
+   Breaks a section out of the normal ~96ch .sheet column, up to its own,
+   much wider cap — for content that genuinely needs real horizontal room
+   (a wide diagram), not a general "make this bigger" utility. Colors are
+   untouched; only width changes. Centers on .doc, which (unlike .sheet) has
+   no width constraint of its own, so plain margin:auto is enough — no need
+   for the 100vw full-bleed trick and its scrollbar edge cases. */
+.wide { max-width: {{ c.wide_max_px }}px; margin: 0 auto; padding: 0 24px; }
+
 /* ---- forms: a plain <form data-api="/api/path"> posted by assets/js/forms.js ---- */
 .doc input, .doc textarea, .doc select, .doc button { font: inherit; color: inherit; }
 .doc :is(input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="url"], textarea) {

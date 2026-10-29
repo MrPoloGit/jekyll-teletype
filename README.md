@@ -17,12 +17,17 @@ This theme extracts that reusable design system — the typography, the line
 numbering, the two-color scheme and where it inverts — so you can write
 ordinary markdown and get the same look, without rebuilding the page by hand.
 
-It deliberately does **not** try to reproduce the source page's bespoke,
-campaign-specific interactive exhibits (a simulated live poker table, a
-hand-tree analysis view, a heads-up duel, a message trace, an animated dot-matrix
-US map). Those were ~4,000 lines of one-off JS/SVG built for that one page. If
-you want something like that, write it as plain HTML/JS and drop it straight
-into a markdown file — the theme will leave it alone.
+The theme itself deliberately does **not** try to generate the source page's
+bespoke, campaign-specific interactive exhibits (a simulated live poker
+table, a hand-tree analysis view, a heads-up duel, a message trace, an
+animated dot-matrix US map, an opening-book tree, a Castle Challenge
+diagram, a thank-you card cascade) from markdown — that's ~4,000 lines of
+one-off JS/SVG, not a reusable markdown feature. They have, however, all
+been **ported** as plain HTML/CSS/JS and live on `exhibits.md` (`/exhibits/`)
+as a demonstration — see "Exhibits" below and `plan.md`'s full roadmap. If
+you want something like that on your own page, that's the pattern: write it
+as plain HTML/JS, scope its CSS/JS to just that page via `extra_css`/
+`extra_js` (see "Per-page CSS/JS"), and the theme leaves it alone.
 
 ## What it can do
 
@@ -39,6 +44,12 @@ into a markdown file — the theme will leave it alone.
   configured palette (dark-on-light by default). This is how you control
   exactly where the page switches tone, same as the source page's alternating
   light/dark panels.
+- **Breaking out of the text column** — wrap a part of a markdown file in
+  `::: wide` / `:::` and that section ignores the normal ~96ch column,
+  running up to `theme_config.wide_max_px` (default 1440) instead, centered.
+  For content that genuinely needs real horizontal room, like a wide
+  diagram — not a general "make this bigger" tool. That content gets no
+  gutter number of its own (there's no `.sheet` to number it against).
 - **Section headers** — `##` renders centered and uppercase, like the source
   page's section titles (`SCHEDULE`, `EXHIBIT A`, etc).
 - **Full-width dividers** — a markdown `---` renders as a literal run of `=`
@@ -60,6 +71,10 @@ into a markdown file — the theme will leave it alone.
   a black underline on hover. See "Radio and checkbox groups" below.
 - **`.banner`** — a solid accent-color band around just a line's text (e.g. a
   section heading), centered. See "Banners" below.
+- **Custom favicon** — drop an icon file (SVG/PNG/ICO/JPG) anywhere under the
+  site (e.g. `assets/favicon.svg`) and point `theme_config.favicon` at it in
+  `_config.yml`; the right `<link rel="icon" type="...">` is emitted for you.
+  Leave it `""` for no icon.
 - **Backend wiring** — a small client-side layer (`assets/js/api.js`,
   `bind.js`, `forms.js`) for talking to a real API: a fetch helper, declarative
   live-data binding (`data-source`/`data-field`), and form POSTing
@@ -67,7 +82,9 @@ into a markdown file — the theme will leave it alone.
 
 ## What it can't do (on purpose)
 
-- No interactive exhibits, canvases, or SVG simulations — see above.
+- The theme itself has no markdown syntax for generating interactive
+  exhibits, canvases, or SVG simulations — see "Exhibits" below for what's
+  actually been built (as page content, not theme features).
 - No per-page overrides of color/gutter settings — the look is one consistent
   site-wide config, matching how the source page is styled throughout.
 - Line numbers count one per **block element**, not one per **visual wrapped
@@ -77,15 +94,19 @@ into a markdown file — the theme will leave it alone.
 
 ## Quickstart
 
-Requires Ruby and Bundler.
+Needs Ruby + Bundler, on a Ruby new enough for Jekyll 4.4.1's `liquid ~> 4.0`
+dependency to resolve — the macOS system Ruby (2.6.x) is too old; use
+rbenv/asdf or similar if `bundle install` fails.
 
 ```bash
 bundle install
 bundle exec jekyll serve
 ```
 
-Then open `http://127.0.0.1:4000/`. Edit `index.md` or `_config.yml` and the
-site rebuilds automatically.
+`_config.yml` sets `baseurl: /jekyll-teletype` (for GitHub Pages project-site
+hosting), so the dev server serves from that path, not `/` — open
+`http://127.0.0.1:4000/jekyll-teletype/`. Edit `index.md`, `exhibits.md`, or
+`_config.yml` and the site rebuilds automatically.
 
 ## Configuring the look
 
@@ -93,9 +114,12 @@ Everything is under `theme_config` in `_config.yml`:
 
 ```yaml
 theme_config:
+  favicon: ""   # path to an icon file (svg/png/ico/jpg), or "" for none
+
   mono_font: "'Source Code Pro', ui-monospace, Menlo, monospace"
   line_height: 1.8
   max_width_ch: 96
+  wide_max_px: 1440   # cap for a ::: wide ::: block
 
   gutter:
     show: true     # turn the numbered column on/off, site-wide
@@ -119,6 +143,9 @@ theme_config:
     gutter: "#747474"
     faint: "#3d3d3d"
     muted: "#a6a6a6"
+
+  api:
+    base_url: ""   # see "Connecting to a backend" below
 ```
 
 `assets/css/main.css` has YAML front matter, so Jekyll runs these values
@@ -201,6 +228,53 @@ class on the heading itself (e.g. `{: .banner}` on the `##` line). Styling the
 whole heading block would shrink it to the band's width and center it, which
 also drags that row's gutter number along with it, off the actual gutter.
 
+## Per-page CSS/JS
+
+Declare `extra_css`/`extra_js` (arrays of asset paths) in a page's front
+matter to load additional stylesheets/scripts on just that page — nothing
+else changes site-wide:
+
+```yaml
+---
+layout: page
+extra_css:
+  - /assets/css/exhibits.css
+extra_js:
+  - /assets/js/exhibits/map.js
+---
+```
+
+This is how `exhibits.md` loads its ported animations/diagrams (see below)
+without bloating every other page.
+
+## Exhibits
+
+`exhibits.md` (`/exhibits/`) hosts animations/diagrams ported from the source
+page — see `plan.md`'s "Exhibits porting roadmap" for the full list and
+status. These are page-specific, not theme features: each lives in
+`assets/css/exhibits.css` / `assets/js/exhibits/<name>.js`, loaded only on
+that page via the mechanism above. All eight ported: the venue map (a
+dot-matrix US outline with pulsing venue dots, regenerated on resize),
+Exhibit A (a small self-contained poker engine driving a canvas grid of
+10,000 simulated tables plus one fully interactive featured table with
+replay controls), Exhibit C (two bots playing heads-up, printing their
+reasoning into a terminal on each side as a packet animates across the wire
+between them, with a live chip-lead sparkline), Exhibit D (a scrolling
+sequence diagram of a dealer and two bots exchanging messages on one wire,
+each bot reply carrying a simulated think-time), the Castle Challenge
+diagram (dot-matrix castles that fill with soldier dots as you type, flags
+raised once exactly 100 are placed), the thank-you card cascade (a
+full-deck animation that plays on a `pbt:applied` event — try the demo
+button on the exhibits page), Exhibit B (a branching decision tree for
+one simulated hand, laid out by a from-scratch collision-avoiding geometry
+engine, with every move not taken drawn as a side branch), and Exhibit E
+(every simulated hand merged into one opening-book tree, the busiest line
+running straight through and thinner branches fanning out and pruning as
+a sliding window of the last 10,000 hands streams in).
+
+**All eight items on the roadmap are now ported.** See `plan.md`'s "Exhibits
+porting roadmap" for the full build notes on each.
+
 ## Connecting to a backend
 
 This is still a static site — Jekyll has no server at request time — so
@@ -264,16 +338,27 @@ uses — it tells kramdown to still run markdown over the form's contents.)
 globally once `api.js` has loaded, for anything `bind.js`/`forms.js` don't
 cover.
 
+**A tested example backend** lives at `../jekyll-teletype-backend` (Flask +
+SQLite): `GET /api/stats` and `POST /api/apply` back the live hand counter
+and apply form on `index.md` (not `exhibits.md` — that page's exhibits are
+all self-contained, no backend calls). Run it alongside `jekyll serve` and
+`theme_config.api.base_url` pointed at it to see the wiring work end to end.
+
 ## How it's built
 
-- `_plugins/screen_blocks.rb` — a pre-render hook that splits a page's markdown
-  on `::: screen ... :::`, wrapping each resulting chunk in its own
-  `<div class="sheet" markdown="1">` (plain chunks) or
-  `<div class="screen"><div class="sheet" markdown="1">` (screen chunks),
-  mirroring the source page's actual DOM: `.screen` is a sibling of `.sheet`,
-  never nested inside one.
-- `assets/css/main.css` — the whole visual system, generated from
+- `_plugins/screen_blocks.rb` — a pre-render hook that splits a page's
+  markdown on `::: screen ... :::` and `::: wide ... :::`, wrapping each
+  resulting chunk in its own `<div class="sheet" markdown="1">` (plain
+  chunks), `<div class="screen"><div class="sheet" markdown="1">` (screen
+  chunks), or `<div class="wide" markdown="1">` (wide chunks — no nested
+  `.sheet`, since escaping its width is the point), mirroring the source
+  page's actual DOM: `.screen`/`.wide` are siblings of `.sheet`, never nested
+  inside one.
+- `assets/css/main.css` — the theme's whole visual system, generated from
   `theme_config` via Liquid.
+- `assets/css/exhibits.css` / `assets/js/exhibits/*.js` — the ported
+  exhibits' own styling/behavior; deliberately *not* part of the theme (see
+  "Exhibits").
 - `_layouts/default.html` / `_layouts/page.html` / `_includes/head.html` —
   the page shell.
 - `assets/js/api.js` / `bind.js` / `forms.js` — the backend-wiring layer

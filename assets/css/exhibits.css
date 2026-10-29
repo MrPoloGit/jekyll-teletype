@@ -1,0 +1,461 @@
+/*
+ * Styling for ported exhibits (see plan.md's "Exhibits porting roadmap").
+ * Deliberately NOT part of assets/css/main.css / the theme itself — these are
+ * one-off diagrams for this site, not reusable theme features. Only loaded on
+ * pages that declare `extra_css: [/assets/css/exhibits.css]` in front matter.
+ * Uses the same var(--ink)/var(--paper)/etc. tokens as the rest of the theme,
+ * so each exhibit still inverts correctly inside a ::: screen ::: block.
+ */
+
+/* ---- shared across every ported exhibit ----
+   Two small layout utilities replace what the source page got for free from
+   its page-wide .l/.c/.gap classes, which this theme doesn't have:
+   .row     — a two-ended flex row (label left, value right), like a kv .tx row
+   .subhead — a centered uppercase sub-heading that doesn't claim its own
+              gutter number (an exhibit's whole wrapping element is one row —
+              see plan.md's notes on individual exhibits for why).
+   Everything else below stays scoped per exhibit (.exhibit-a, .exhibit-c,
+   ...), matching how the source page itself scoped each one, so exhibits
+   sharing generic names like .legend or button.t never collide. */
+.row { display: flex; flex-wrap: wrap; justify-content: space-between; column-gap: 2ch; }
+.subhead { text-align: center; text-transform: uppercase; margin: 1em 0 .5em; }
+.indent { padding-left: 2ch; }
+
+/* ---- Venue map: a dot-matrix United States with pulsing venue dots (scoped to .map-fig) ---- */
+.map-fig { margin: 0; max-width: 560px; }
+.map-fig svg { display: block; width: 100%; height: auto; overflow: visible; }
+.map-fig .land { fill: var(--faint); }
+.map-fig .city { fill: var(--ink); }
+.map-fig .ring, .map-fig .pulse { fill: none; stroke: var(--ink); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.map-fig .pulse { transform-box: fill-box; transform-origin: center; animation: map-pulse 2.4s ease-out infinite; }
+.map-fig text { font-family: var(--mono); font-size: 10px; fill: var(--ink); }
+.map-fig text .d { fill: var(--muted); }
+@keyframes map-pulse { from { transform: scale(1); opacity: .9; } to { transform: scale(4.5); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .map-fig .pulse { animation: none; opacity: 0; } }
+
+/* ---- Exhibit A: live tables (scoped to .exhibit-a) ---- */
+.exhibit-a .legend { color: var(--muted); white-space: pre-wrap; }
+
+.exhibit-a figure { margin: .5em 0; }
+.exhibit-a button.t {
+  font: inherit; color: inherit; background: none; border: 0; padding: 0 .5ch;
+  cursor: pointer; line-height: inherit;
+}
+.exhibit-a button.t:hover { outline: 1px solid var(--ink); outline-offset: -1px; }
+.exhibit-a button.t:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.exhibit-a button.t[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+
+.exhibit-a .grid-fig canvas { display: block; width: 100%; }
+
+.exhibit-a .table-fig { position: relative; aspect-ratio: 2 / 1; }
+.exhibit-a .felt {
+  position: absolute; inset: 15% 10%; border: 1px solid var(--ink); border-radius: 50%;
+  box-shadow: 0 0 0 5px var(--paper), 0 0 0 6px var(--ink);
+}
+.exhibit-a .center {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  font-size: 12px; line-height: 1.3;
+}
+.exhibit-a .board { display: flex; gap: 5px; }
+.exhibit-a .seat {
+  position: absolute; transform: translate(-50%, -50%); width: 14ch;
+  display: flex; flex-direction: column; align-items: center;
+  font-size: 11px; line-height: 1.35; background: var(--paper); padding: 3px 0;
+}
+.exhibit-a .seat .hole { display: flex; gap: 4px; margin-bottom: 4px; min-height: 37px; }
+.exhibit-a .seat .who { padding: 0 .6ch; white-space: nowrap; }
+.exhibit-a .seat .meta { white-space: nowrap; }
+.exhibit-a .seat .bar { width: 10ch; height: 4px; border: 1px solid var(--ink); margin: 2px 0; }
+.exhibit-a .seat .bar i { display: block; height: 100%; background: var(--ink); width: 0; }
+.exhibit-a .seat .act { min-height: 1.35em; white-space: nowrap; }
+.exhibit-a .seat.turn .who, .exhibit-a .seat.win .who { background: var(--ink); color: var(--paper); }
+.exhibit-a .seat.out { color: var(--muted); }
+.exhibit-a .seat.out .cd { color: var(--muted); border-color: var(--faint); box-shadow: none; }
+.exhibit-a .seat.out .bar { border-color: var(--faint); }
+
+.exhibit-a .cd {
+  display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
+  width: 26px; height: 36px; border: 1px solid var(--ink); border-radius: 3px;
+  background: var(--paper); box-shadow: 1px 1px 0 var(--ink);
+  font-size: 11px; font-weight: 400; line-height: 1;
+}
+.exhibit-a .cd i { font-style: normal; font-size: 12px; }
+.exhibit-a .cd.slot { border: 1px dashed var(--faint); box-shadow: none; }
+.exhibit-a .board .cd { width: 42px; height: 58px; font-size: 17px; gap: 3px; border-radius: 4px; box-shadow: 2px 2px 0 var(--ink); }
+.exhibit-a .board .cd i { font-size: 21px; }
+.exhibit-a .board .cd.slot { box-shadow: none; }
+.exhibit-a .cd.new { animation: exhibit-a-deal .15s steps(3); }
+@keyframes exhibit-a-deal { from { transform: translateY(-4px); opacity: 0; } }
+
+.exhibit-a .strip { display: flex; justify-content: space-between; flex-wrap: nowrap; column-gap: 1ch; }
+.exhibit-a .strip .name { flex: none; width: 12ch; white-space: nowrap; overflow: hidden; }
+.exhibit-a .strip.out .name { color: var(--muted); }
+.exhibit-a .track { position: relative; flex: 1; min-width: 0; }
+.exhibit-a .track .in { position: absolute; inset: 0 1ch; }
+.exhibit-a .track .ln { position: absolute; left: 0; top: 53%; height: 1px; background: var(--ink); }
+.exhibit-a .track b { position: absolute; top: 0; transform: translateX(-50%); font-weight: 400; }
+.exhibit-a .track b.w { background: var(--ink); color: var(--paper); padding: 0 .3ch; }
+.exhibit-a .strip.head .track b { font-weight: 400; cursor: pointer; }
+.exhibit-a .strip.head .track b:hover { background: var(--ink); color: var(--paper); }
+.exhibit-a .track .ln.future { background: var(--faint); }
+.exhibit-a .track b.future { color: var(--muted); }
+.exhibit-a .short { display: none; }
+@media (min-width: 681px) and (max-width: 860px) { .exhibit-a .table-fig { aspect-ratio: 5 / 3; } }
+@media (prefers-reduced-motion: reduce) { .exhibit-a .cd.new { animation: none; } }
+@media (forced-colors: active) {
+  .exhibit-a button.t[aria-pressed="true"], .exhibit-a .seat.turn .who, .exhibit-a .seat.win .who, .exhibit-a .track b.w {
+    forced-color-adjust: none; background: Highlight; color: HighlightText;
+  }
+  .exhibit-a .seat .bar i, .exhibit-a .track .ln { forced-color-adjust: none; background: CanvasText; }
+  .exhibit-a .track .ln.future { background: GrayText; }
+}
+
+/* ---- Exhibit C: heads-up duel (scoped to .exhibit-c) ---- */
+.exhibit-c button.t {
+  font: inherit; color: inherit; background: none; border: 0; padding: 0 .5ch;
+  cursor: pointer; line-height: inherit;
+}
+.exhibit-c button.t:hover { outline: 1px solid var(--ink); outline-offset: -1px; }
+.exhibit-c button.t:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.exhibit-c button.t[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+
+/* Left bot | board, pot and the wire | right bot */
+.exhibit-c .du-fig {
+  margin: .5em 0; display: grid; grid-template-columns: minmax(0, 1fr) 26ch minmax(0, 1fr);
+  column-gap: 2ch; font-size: 12px; line-height: 1.5;
+}
+.exhibit-c .du-side { min-width: 0; padding: 4px 6px 6px; }
+.exhibit-c .du-head { display: flex; gap: 1ch; white-space: nowrap; }
+.exhibit-c .du-stk { margin-left: auto; }
+.exhibit-c .du-r .du-head { flex-direction: row-reverse; }
+.exhibit-c .du-r .du-stk { margin-left: 0; margin-right: auto; }
+.exhibit-c .du-name { font-weight: 400; padding: 0 .5ch; }
+.exhibit-c .du-pos { color: var(--muted); }
+.exhibit-c .du-hole { display: flex; gap: 4px; height: 37px; margin: 4px 0 6px; }
+.exhibit-c .du-r .du-hole { justify-content: flex-end; }
+.exhibit-c .du-term { border: 1px solid var(--ink); padding: 3px 1ch; font-size: 11px; line-height: 1.55; }
+.exhibit-c .du-term div { height: 1.55em; white-space: nowrap; overflow: hidden; }
+.exhibit-c .du-term .a { font-weight: 400; }
+.exhibit-c .du-term .d { color: var(--muted); }
+.exhibit-c .du-side.turn .du-name { background: var(--ink); color: var(--paper); }
+.exhibit-c .du-side.win { background: var(--ink); color: var(--paper); }
+.exhibit-c .du-side.win .du-name { background: var(--paper); color: var(--ink); }
+.exhibit-c .du-side.win .du-term { border-color: var(--paper); }
+.exhibit-c .du-side.win .du-pos, .exhibit-c .du-side.win .du-term .d { color: inherit; }
+
+.exhibit-c .du-mid { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; min-width: 0; }
+.exhibit-c .du-row { display: flex; justify-content: space-between; gap: 1ch; width: 100%; white-space: nowrap; }
+.exhibit-c .du-board { display: flex; gap: 4px; padding: 2px 0; }
+/* The wire runs across the column gaps so it meets both bots. */
+.exhibit-c .du-wire { position: relative; align-self: stretch; height: 18px; margin: 0 -2ch; }
+.exhibit-c .du-wire::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; border-top: 1px solid var(--ink); }
+.exhibit-c .du-pkt {
+  position: absolute; top: 50%; left: 0; transform: translate(0, -50%); visibility: hidden;
+  background: var(--paper); border: 1px solid var(--ink); padding: 0 .6ch;
+  font-size: 10px; line-height: 1.5; white-space: nowrap;
+}
+.exhibit-c .du-eq { display: flex; align-items: center; gap: 1ch; width: 100%; white-space: nowrap; }
+.exhibit-c .du-eq span { width: 4ch; text-align: right; }
+.exhibit-c .du-eq span:last-child { text-align: left; }
+.exhibit-c .du-bar { flex: 1; height: 7px; border: 1px solid var(--ink); }
+.exhibit-c .du-bar i { display: block; height: 100%; width: 50%; background: var(--ink); }
+
+/* Mini cards, as on the page */
+.exhibit-c .cd {
+  display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
+  width: 26px; height: 36px; border: 1px solid var(--ink); border-radius: 3px;
+  background: var(--paper); color: var(--ink); box-shadow: 1px 1px 0 var(--ink);
+  font-size: 11px; font-weight: 400; line-height: 1;
+}
+.exhibit-c .cd i { font-style: normal; font-size: 12px; }
+.exhibit-c .cd.slot { border: 1px dashed var(--faint); box-shadow: none; background: none; }
+.exhibit-c .cd.back { outline: 1px solid var(--ink); outline-offset: -5px; }
+.exhibit-c .cd.new { animation: exhibit-c-deal .15s steps(3); }
+.exhibit-c .cd.flip { animation: exhibit-c-flip .2s steps(3); }
+@keyframes exhibit-c-deal { from { transform: translateY(-4px); opacity: 0; } }
+@keyframes exhibit-c-flip { from { transform: scaleX(0); } }
+
+.exhibit-c .du-spark { flex: 1 1 8ch; min-width: 4ch; height: 13px; align-self: center; display: block; }
+.exhibit-c .du-legend { color: var(--muted); white-space: pre-wrap; }
+
+@media (max-width: 680px) {
+  /* Board on top, the two bots side by side underneath. */
+  .exhibit-c .du-fig {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: "m m" "l r";
+    column-gap: 1ch; row-gap: 4px; font-size: 10px;
+  }
+  .exhibit-c .du-mid { grid-area: m; }
+  .exhibit-c .du-l { grid-area: l; }
+  .exhibit-c .du-r { grid-area: r; }
+  .exhibit-c .du-wire { margin: 0; }
+  .exhibit-c .du-side { padding: 3px 4px 4px; }
+  /* The panes touch here, so each stack stays beside its own bot's name. */
+  .exhibit-c .du-stk, .exhibit-c .du-r .du-stk { margin: 0; }
+  .exhibit-c .du-term { font-size: 9.5px; padding: 2px .6ch; }
+  .exhibit-c .wide { display: none; }
+  /* One line per readout row, so the page below keeps still while hands play. */
+  .exhibit-c .du-ro { flex-wrap: nowrap; }
+  .exhibit-c .du-ro > * { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .exhibit-c .du-ro > :first-child { flex: none; }
+}
+@media (prefers-reduced-motion: reduce) { .exhibit-c .cd.new, .exhibit-c .cd.flip { animation: none; } }
+@media (forced-colors: active) {
+  .exhibit-c button.t[aria-pressed="true"], .exhibit-c .du-side.turn .du-name, .exhibit-c .du-side.win {
+    forced-color-adjust: none; background: Highlight; color: HighlightText;
+  }
+  .exhibit-c .du-bar i { forced-color-adjust: none; background: CanvasText; }
+}
+
+/* ---- Exhibit D: message trace (scoped to .exhibit-d) ---- */
+.exhibit-d button.t {
+  font: inherit; color: inherit; background: none; border: 0; padding: 0 .5ch;
+  cursor: pointer; line-height: inherit;
+}
+.exhibit-d button.t:hover { outline: 1px solid var(--ink); outline-offset: -1px; }
+.exhibit-d button.t:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.exhibit-d button.t[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.exhibit-d .short { display: none; }
+.exhibit-d .key { color: var(--muted); justify-content: flex-start; }
+.exhibit-d .key svg { vertical-align: -1px; margin-right: .5ch; color: var(--ink); }
+
+/* --mt-r: row height. --mt-a: arrow y inside a row. --mt-g: how far the timestamps reach into the gutter. */
+.exhibit-d .mt-fig { --mt-r: 24px; --mt-a: 17px; --mt-g: 60px; --mt-s: 160ms; margin: .5em 0; font-size: 11px; line-height: 14px; }
+.exhibit-d .mt-head { position: relative; height: 26px; }
+.exhibit-d .mt-p {
+  position: absolute; top: 0; left: var(--x); transform: translateX(-50%); z-index: 1;
+  border: 1px solid var(--ink); background: var(--paper); padding: 2px .8ch; white-space: nowrap;
+}
+.exhibit-d .mt-p.on { background: var(--ink); color: var(--paper); }
+.exhibit-d .mt-life { position: absolute; top: 0; bottom: 0; left: var(--x); border-left: 1px dashed var(--gutter); }
+.exhibit-d .mt-win { position: relative; height: calc(10 * var(--mt-r)); margin-left: calc(-1 * var(--mt-g)); overflow: hidden; }
+.exhibit-d .mt-in { position: absolute; top: 0; bottom: 0; left: var(--mt-g); right: 0; }
+.exhibit-d .mt-rows { position: absolute; inset: 0; transition: transform var(--mt-s) ease-out; }
+.exhibit-d .mt-rows.jump { transition: none; }
+.exhibit-d .mt-row { position: absolute; left: 0; right: 0; height: var(--mt-r); white-space: nowrap; }
+.exhibit-d .mt-ts {
+  position: absolute; top: 1px; left: calc(-1 * var(--mt-g)); width: calc(var(--mt-g) - 16px);
+  text-align: right; font-size: 10px; color: var(--muted);
+}
+.exhibit-d .mt-lb {
+  position: absolute; top: 1px; transform: translateX(-50%); padding: 0 .5ch;
+  max-width: calc(42% - 10px); overflow: hidden; text-overflow: ellipsis;
+}
+.exhibit-d .mt-lb.bc { max-width: calc(100% - 4px); background: var(--paper); }
+.exhibit-d .mt-lb em { font-style: normal; color: var(--muted); margin-left: 1ch; }
+
+/* Arrows draw from sender to receiver: solid with a filled head from the dealer, dashed with an open head back. */
+.exhibit-d .mt-ar { position: absolute; top: calc(var(--mt-a) - 3px); height: 7px; }
+.exhibit-d .mt-ar::before { content: ""; position: absolute; left: 0; right: 0; top: 3px; border-top: 1px solid currentColor; }
+.exhibit-d .mt-ar.rp::before { border-top-style: dashed; }
+.exhibit-d .mt-ar svg { position: absolute; top: 0; }
+.exhibit-d .mt-ar.mt-e svg { right: 0; }
+.exhibit-d .mt-ar.mt-w svg { left: 0; }
+.exhibit-d .mt-ar.mt-e { animation: exhibit-d-dr var(--mt-d) linear both; }
+.exhibit-d .mt-ar.mt-w { animation: exhibit-d-dl var(--mt-d) linear both; }
+.exhibit-d .still .mt-ar { animation: none; }
+@keyframes exhibit-d-dr { from { clip-path: inset(0 100% 0 0); } }
+@keyframes exhibit-d-dl { from { clip-path: inset(0 0 0 100%); } }
+
+/* Activation box: the bot is thinking. It grows down to the row where its reply lands. */
+.exhibit-d .mt-act {
+  position: absolute; top: var(--mt-a); left: calc(var(--x) - 3px); width: 7px; height: 2px;
+  border: 1px solid var(--ink); background: var(--paper); transition: height 0s linear;
+}
+.exhibit-d .mt-act.on { height: calc(var(--mt-r) + 1px); }
+
+.exhibit-d .mt-sep { position: absolute; left: 0; right: 0; top: 50%; border-top: 1px solid var(--ink); }
+.exhibit-d .mt-sep span {
+  position: absolute; left: 50%; top: 0; transform: translate(-50%, -50%); max-width: 100%;
+  background: var(--paper); padding: 0 1ch; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* Both full bot readouts need about 85ch; below that use the short forms rather than wrap onto an unnumbered line. */
+@media (max-width: 880px) {
+  .exhibit-d .mt-bots .full { display: none; }
+  .exhibit-d .mt-bots .short { display: inline; }
+}
+@media (max-width: 680px) {
+  .exhibit-d .full { display: none; }
+  .exhibit-d .short { display: inline; }
+  .exhibit-d .mt-fig { --mt-r: 22px; --mt-a: 16px; --mt-g: 36px; font-size: 10px; line-height: 13px; }
+  .exhibit-d .mt-ts { font-size: 9px; width: calc(var(--mt-g) - 6px); }
+  /* One line per readout row, so the page below keeps still while the trace runs. */
+  .exhibit-d .ro { flex-wrap: nowrap; }
+  .exhibit-d .ro > span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .exhibit-d .mt-ar { animation: none !important; }
+  .exhibit-d .mt-rows, .exhibit-d .mt-act { transition: none !important; }
+}
+@media (forced-colors: active) {
+  .exhibit-d button.t[aria-pressed="true"], .exhibit-d .mt-p.on { forced-color-adjust: none; background: Highlight; color: HighlightText; }
+}
+
+/* ---- Castle Challenge: the map's dots, one per soldier (scoped to .castle-fig) ----
+   Unprefixed like .map-fig — a unique enough name on its own. */
+/* main.css's site-wide input styling defaults to width: 100%, right for a
+   kv row's text fields but wrong for a 0-100 soldier count — narrow it.
+   Applied via class="qty" on the five castle <input>s in exhibits.md. Needs
+   to out-specificity main.css's `.doc input[type=...]` rule, hence the long
+   selector rather than just `.qty`. */
+.doc input.qty[type="number"] { width: 7ch; flex: none; }
+.castle-fig { margin: 0; display: block; }
+.castle-fig svg { display: block; overflow: visible; }
+.castle-fig .stone { fill: var(--ink); }
+.castle-fig .sol {
+  fill: var(--faint); transform-box: fill-box; transform-origin: center; transform: scale(.5);
+  transition: transform .14s ease-out, fill .14s;
+}
+.castle-fig .sol.on { fill: var(--ink); transform: scale(1); }
+.castle-fig .flag { fill: var(--faint); transition: fill .3s; }
+.castle-fig .flag.up { fill: var(--ink); }
+.castle-fig text { font-family: var(--mono); font-size: 10px; fill: var(--ink); text-anchor: middle; }
+.castle-fig text.n { font-weight: 400; }
+.castle-fig text.d { fill: var(--muted); }
+@media (prefers-reduced-motion: reduce) { .castle-fig .sol, .castle-fig .flag { transition: none; } }
+@media (forced-colors: active) {
+  .castle-fig svg { forced-color-adjust: none; }
+  .castle-fig .stone, .castle-fig .sol, .castle-fig .flag { fill: GrayText; }
+  .castle-fig .sol.on, .castle-fig .flag.up, .castle-fig text { fill: CanvasText; }
+}
+
+/* ---- Thank-you card cascade (scoped to .thanks; injected into document.body by JS,
+   so it's outside .doc/.sheet entirely — a fixed full-viewport overlay, not a page row) ---- */
+html.celebrating { overflow: hidden; }
+.thanks { position: fixed; inset: 0; z-index: 50; }
+.thanks canvas { position: absolute; inset: 0; width: 100%; height: 100%; cursor: pointer; }
+.thanks-card {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(44ch, calc(100vw - 32px));
+  background: var(--paper); color: var(--ink); border: 1px solid var(--ink); box-shadow: 4px 4px 0 var(--ink);
+  padding: 18px 24px 22px; text-align: center; text-transform: uppercase; font-size: 15px; line-height: 1.8;
+}
+.thanks-card h2 { font: inherit; font-weight: 400; margin: 0 0 .4em; }
+.thanks-card p { margin: 0; }
+.thanks-card button {
+  font: inherit; font-weight: 400; color: inherit; background: none; border: 1px solid var(--ink);
+  padding: 0 1.5ch; margin-top: 1em; cursor: pointer; text-transform: inherit;
+}
+.thanks-card button:hover, .thanks-card button:focus-visible { background: var(--ink); color: var(--paper); outline: none; }
+@media print { .thanks { display: none !important; } }
+
+/* ---- Exhibit B: analysis of one hand (scoped to .exhibit-b) ---- */
+.exhibit-b button.t {
+  font: inherit; color: inherit; background: none; border: 0; padding: 0 .5ch;
+  cursor: pointer; line-height: inherit;
+}
+.exhibit-b button.t:hover { outline: 1px solid var(--ink); outline-offset: -1px; }
+.exhibit-b button.t:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.exhibit-b button.t[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+/* The plate is wider than the text column; a hand too long for it is scaled down to fit.
+   overflow-anchor: none keeps the page below it still when a new hand changes its height. */
+.exhibit-b .tree-fig { margin: .75em auto; max-width: 1440px; padding: 0 24px; overflow: hidden; overflow-anchor: none; }
+.exhibit-b .tree { display: block; margin: 0 auto; color: var(--ink); }
+.exhibit-b .tree .br { fill: none; stroke: currentColor; stroke-width: 1; }
+.exhibit-b .tree .dot { fill: currentColor; }
+.exhibit-b .tree .ch { fill: var(--paper); stroke: currentColor; stroke-width: 1; }
+.exhibit-b .tree .bx { fill: currentColor; stroke: currentColor; stroke-width: 1; }
+.exhibit-b .tree .bx.open { fill: var(--paper); }
+.exhibit-b .tree text {
+  font-family: var(--mono); font-size: 10px; fill: currentColor;
+  paint-order: stroke; stroke: var(--paper); stroke-width: 3px; stroke-linejoin: round;
+}
+.exhibit-b .tree .val { font-size: 11px; font-weight: 400; }
+.exhibit-b .tree .sm { font-size: 9px; fill: var(--muted); }
+.exhibit-b .ro { justify-content: flex-start; }
+.exhibit-b .ro .k { flex: none; width: 7ch; }
+.exhibit-b .ro .v { flex: 1 1 auto; min-width: 0; }
+.exhibit-b .ro .r { margin-left: auto; }
+.exhibit-b .legend { color: var(--muted); white-space: pre-wrap; }
+.exhibit-b .key { justify-content: flex-start; }
+.exhibit-b .key .g { flex: none; width: 7ch; display: flex; align-items: center; gap: .5ch; color: var(--ink); }
+.exhibit-b .key svg { display: block; }
+/* Compact legend: glyph and word pairs on one line. */
+.exhibit-b .keyline { justify-content: flex-start; column-gap: 2ch; color: var(--muted); }
+.exhibit-b .keyline .ki { display: inline-flex; align-items: center; gap: .6ch; white-space: nowrap; }
+.exhibit-b .keyline svg { display: block; color: var(--ink); }
+@media (forced-colors: active) {
+  .exhibit-b button.t[aria-pressed="true"] { forced-color-adjust: none; background: Highlight; color: HighlightText; }
+  .exhibit-b .tree, .exhibit-b .key svg { forced-color-adjust: none; color: CanvasText; }
+  .exhibit-b .tree .ch, .exhibit-b .tree .bx.open { fill: Canvas; }
+  .exhibit-b .tree text { stroke: Canvas; }
+  .exhibit-b .tree .sm { fill: CanvasText; }
+}
+
+/* ---- Exhibit E: the opening book (scoped to .exhibit-e) ----
+   Unlike Exhibit B, this tree adapts its column count to whatever width
+   it has (measure() in opening-book.js) rather than switching layout mode
+   at a width threshold, and scrolls sideways if it still doesn't fit — so,
+   unlike Exhibit B, it does NOT need a ::: wide ::: breakout; it stays
+   inside the normal .sheet/.screen flow, matching the source page. */
+.exhibit-e figure { margin: .5em 0; }
+.exhibit-e button.t {
+  font: inherit; color: inherit; background: none; border: 0; padding: 0 .5ch;
+  cursor: pointer; line-height: inherit;
+}
+.exhibit-e button.t:hover { outline: 1px solid var(--ink); outline-offset: -1px; }
+.exhibit-e button.t:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.exhibit-e button.t[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.exhibit-e button.t[aria-disabled="true"] { color: var(--muted); cursor: default; }
+.exhibit-e button.t[aria-disabled="true"]:hover { outline: 0; }
+.exhibit-e .legend { color: var(--muted); }
+.exhibit-e .legend .k { color: var(--ink); }
+.exhibit-e .glyph { display: inline-block; width: 12px; height: 12px; vertical-align: -1px; margin-right: .5ch; overflow: visible; }
+.exhibit-e .ro { flex-wrap: nowrap; }
+/* Live numbers keep a fixed width so lines never re-wrap as digits tick. */
+.exhibit-e .num { display: inline-block; min-width: 6ch; }
+.exhibit-e .num.r { text-align: right; }
+.exhibit-e .ro > span { white-space: pre; overflow: hidden; min-width: 0; }
+
+.exhibit-e .tree-fig { overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; }
+.exhibit-e .tree-fig:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.exhibit-e .tree-fig svg { display: block; }
+.exhibit-e .tree-fig text { font-family: var(--mono); fill: var(--ink); }
+.exhibit-e .tree-fig .e { fill: none; stroke: var(--ink); stroke-linecap: round; }
+.exhibit-e .tree-fig .ms { fill: none; stroke: var(--muted); stroke-width: 1; stroke-dasharray: 1 2.5; }
+.exhibit-e .tree-fig .dot { fill: var(--ink); }
+.exhibit-e .tree-fig .ch { fill: var(--paper); stroke: var(--ink); stroke-width: 1; }
+.exhibit-e .tree-fig .bx { stroke: var(--ink); stroke-width: 1; fill: var(--paper); }
+.exhibit-e .tree-fig .bx.full { fill: var(--ink); }
+.exhibit-e .tree-fig .lb, .exhibit-e .tree-fig .cb, .exhibit-e .tree-fig .mb { fill: var(--paper); }
+.exhibit-e .tree-fig .pt, .exhibit-e .tree-fig .mt { fill: var(--muted); font-size: 9px; }
+.exhibit-e .tree-fig .wall .wl { fill: none; stroke: var(--ink); stroke-width: 1; }
+.exhibit-e .tree-fig .wall .ww { stroke-width: 1.5; }
+.exhibit-e .tree-fig .wall text { font-size: 10px; }
+/* The hand that just went through: heavier line, inverted label boxes. */
+.exhibit-e .tree-fig .hl .lb, .exhibit-e .tree-fig .hlc .cb, .exhibit-e .tree-fig .hlm .mb { fill: var(--ink); }
+.exhibit-e .tree-fig .hl .lt, .exhibit-e .tree-fig .hlc .ct, .exhibit-e .tree-fig .hlm .mt { fill: var(--paper); }
+.exhibit-e .tree-fig .hl .ch { stroke-width: 2; }
+
+/* The last hand's cards, as tiny cards: the board, then the winner's two (face down when
+   nobody saw them because everyone else folded). */
+.exhibit-e .mcards { justify-content: flex-start; align-items: center; column-gap: 1ch; }
+.exhibit-e .mcards .lbl { color: var(--muted); }
+.exhibit-e .mrow { display: inline-flex; gap: 3px; margin-right: 2ch; }
+.exhibit-e .mc {
+  display: inline-flex; flex-direction: column; align-items: center; justify-content: center;
+  width: 17px; height: 23px; border: 1px solid var(--ink); border-radius: 2px;
+  background: var(--paper); box-shadow: 1px 1px 0 var(--ink);
+  font-size: 9px; font-weight: 400; line-height: 1;
+}
+.exhibit-e .mc i { font-style: normal; font-size: 9px; }
+.exhibit-e .mc.slot { border: 1px dashed var(--faint); box-shadow: none; }
+.exhibit-e .mc.back { background: radial-gradient(var(--ink) 0.6px, transparent 0.8px) 0 0 / 3px 3px, var(--paper); }
+/* The highlighted hand's street cards, drawn beside its FLOP, TURN and RIVER nodes. */
+.exhibit-e .tree-fig .bc .cf { fill: var(--paper); stroke: var(--ink); stroke-width: 1; }
+.exhibit-e .tree-fig .bc .cs { fill: var(--ink); }
+.exhibit-e .tree-fig .bc text { font-size: 8px; font-weight: 400; fill: var(--ink); text-anchor: middle; }
+@media (max-width: 680px) {
+  .exhibit-e .pair > :last-child { flex-basis: 100%; text-align: right; }
+}
+@media (forced-colors: active) {
+  .exhibit-e button.t[aria-pressed="true"] { forced-color-adjust: none; background: Highlight; color: HighlightText; }
+  .exhibit-e .tree-fig svg { forced-color-adjust: none; background: Canvas; }
+  .exhibit-e .tree-fig text, .exhibit-e .tree-fig .dot, .exhibit-e .tree-fig .bx.full { fill: CanvasText; }
+  .exhibit-e .tree-fig .e, .exhibit-e .tree-fig .ch, .exhibit-e .tree-fig .bx, .exhibit-e .tree-fig .wall .wl { stroke: CanvasText; }
+  .exhibit-e .tree-fig .lb, .exhibit-e .tree-fig .cb, .exhibit-e .tree-fig .mb, .exhibit-e .tree-fig .ch, .exhibit-e .tree-fig .bx { fill: Canvas; }
+  .exhibit-e .tree-fig .hl .lb, .exhibit-e .tree-fig .hlc .cb, .exhibit-e .tree-fig .hlm .mb { fill: Highlight; }
+  .exhibit-e .tree-fig .hl .lt, .exhibit-e .tree-fig .hlc .ct, .exhibit-e .tree-fig .hlm .mt { fill: HighlightText; }
+  .exhibit-e .tree-fig .bc .cf { fill: Canvas; stroke: CanvasText; }
+  .exhibit-e .tree-fig .bc .cs, .exhibit-e .tree-fig .bc text { fill: CanvasText; }
+}

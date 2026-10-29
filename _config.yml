@@ -1,6 +1,8 @@
 title: Printed Transcript
 description: A Jekyll theme for the "printed transcript" look — monospace, numbered lines, two-tone ink/paper colors that invert in screen panels.
 
+baseurl: /jekyll-teletype
+
 markdown: kramdown
 kramdown:
   input: GFM
@@ -14,9 +16,14 @@ plugins:
 # assets/css/main.css (which Jekyll runs through Liquid before writing it out).
 # ---------------------------------------------------------------------------
 theme_config:
+  # path to a favicon file under the site (e.g. an SVG, PNG, or .ico you've
+  # dropped in assets/) — leave "" for no icon at all
+  favicon: ""
+
   mono_font: "'Source Code Pro', ui-monospace, Menlo, monospace"
   line_height: 1.8
   max_width_ch: 96
+  wide_max_px: 1440   # cap for a ::: wide ::: block (see assets/css/main.css's .wide)
 
   gutter:
     show: true    # turn the whole numbered column on/off, site-wide
@@ -55,5 +62,5 @@ exclude:
   - Gemfile
   - Gemfile.lock
   - plan.md
-  - "No Limit_ A Bot Building Tournament.html"
+  - teletype.html
   - vendor
