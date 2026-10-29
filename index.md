@@ -10,6 +10,7 @@ Teams of 1 or 2 get 60 minutes to build a pokerbot from scratch.
 {: .notice}
 
 [See the ported exhibits →]({{ "/exhibits/" | relative_url }}){: .apply}
+[See the extra exhibits →]({{ "/extra-exhibit/" | relative_url }}){: .apply}
 
 ## Schedule
 

@@ -1,0 +1,228 @@
+/*
+ * Styling for the "extra exhibits" (see plan.md's "Future exhibits roadmap"):
+ * ports of the live-tables pattern to other games, one scope per game
+ * (.extra-mahjong, .extra-bridge, ...). Lives on its own page, extra-exhibit.md,
+ * which also loads assets/css/exhibits.css for the shared .row/.subhead/.legend
+ * utilities documented at the top of that file. Uses the same var(--ink)/
+ * var(--paper)/etc. tokens as the rest of the theme, so it still inverts
+ * correctly inside a ::: screen ::: block.
+ */
+
+/* ---- Mahjong: four hands around a square table (scoped to .extra-mahjong) ---- */
+.extra-mahjong button.t {
+  font: inherit; color: inherit; background: none; border: 0; padding: 0 .5ch;
+  cursor: pointer; line-height: inherit;
+}
+.extra-mahjong button.t:hover { outline: 1px solid var(--ink); outline-offset: -1px; }
+.extra-mahjong button.t:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.extra-mahjong button.t[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+
+.extra-mahjong .mj-fig {
+  position: relative; margin: .75em auto; max-width: 620px; aspect-ratio: 1 / 1;
+  display: grid; grid-template-columns: 1fr 2.2fr 1fr; grid-template-rows: 1fr 2.2fr 1fr;
+  grid-template-areas: ". n ." "w mid e" ". s .";
+  gap: 6px;
+}
+.extra-mahjong .mj-side {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 4px; min-width: 0; min-height: 0;
+}
+.extra-mahjong .mj-side.n { grid-area: n; }
+.extra-mahjong .mj-side.s { grid-area: s; }
+.extra-mahjong .mj-side.e { grid-area: e; }
+.extra-mahjong .mj-side.w { grid-area: w; }
+.extra-mahjong .mj-lbl { font-size: 11px; letter-spacing: .05em; color: var(--muted); padding: 0 .6ch; }
+.extra-mahjong .mj-side.turn .mj-lbl { background: var(--ink); color: var(--paper); }
+.extra-mahjong .mj-side.win .mj-lbl { background: var(--green); color: var(--paper); }
+.extra-mahjong .mj-hand { display: flex; gap: 2px; min-width: 0; min-height: 0; }
+.extra-mahjong .mj-side.n .mj-hand, .extra-mahjong .mj-side.s .mj-hand {
+  flex-direction: row; flex-wrap: wrap; justify-content: center; max-width: 100%;
+}
+.extra-mahjong .mj-side.e .mj-hand, .extra-mahjong .mj-side.w .mj-hand { flex-direction: column; align-items: center; }
+.extra-mahjong .tile { font-size: 20px; line-height: 1; }
+.extra-mahjong .mj-side.e .tile, .extra-mahjong .mj-side.w .tile { font-size: 15px; }
+/* The red dragon is a hand-drawn SVG, not a font glyph (see mahjong.js) —
+   sized/aligned in em so it tracks the other tiles' font-size. A font-metric
+   measurement (PIL against Apple Symbols.ttf) turned out unreliable as a
+   source of truth here, so this is tuned by eye against screenshots of the
+   real glyphs on the actual page instead. The real tiles' boxes sit flush
+   against their neighbors with no extra gap of their own, so this one
+   relies on .mj-hand's flex `gap` too instead of adding its own margin.
+   IMPORTANT: width:height here must stay at the SVG's own viewBox ratio
+   (24:32 = 0.75). Mismatching them doesn't stretch the art (SVG's default
+   preserveAspectRatio scales it uniformly) — it letterboxes, leaving blank
+   space inside the box on whichever axis isn't the binding constraint. The
+   last few rounds of "too much space on the sides" were this, not the
+   inner-shape padding in mahjong.js. */
+.extra-mahjong .tile.rd svg { display: inline-block; width: .75em; height: 1em; vertical-align: -.3em; }
+.extra-mahjong .tile.new { animation: extra-mahjong-deal .15s steps(3); }
+.extra-mahjong .tile.toss { animation: extra-mahjong-deal .15s steps(3); }
+@keyframes extra-mahjong-deal { from { transform: translateY(-4px); opacity: 0; } }
+
+.extra-mahjong .mj-mid {
+  grid-area: mid; position: relative; min-width: 0; min-height: 0;
+  display: grid; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr 1fr;
+  grid-template-areas: ". dn ." "dw info de" ". ds .";
+  gap: 2px; border: 1px solid var(--faint); padding: 4px; overflow: hidden;
+}
+.extra-mahjong .mj-dis {
+  display: flex; flex-wrap: wrap; align-content: flex-start; justify-content: center;
+  gap: 1px; font-size: 13px; min-width: 0; min-height: 0; overflow: hidden;
+}
+.extra-mahjong .mj-dis.n { grid-area: dn; }
+.extra-mahjong .mj-dis.s { grid-area: ds; }
+.extra-mahjong .mj-dis.e { grid-area: de; }
+.extra-mahjong .mj-dis.w { grid-area: dw; }
+.extra-mahjong .mj-info { grid-area: info; font-size: 11px; text-align: center; color: var(--muted); align-self: center; }
+
+@media (max-width: 680px) {
+  .extra-mahjong .mj-fig { max-width: 420px; }
+  .extra-mahjong .tile { font-size: 15px; }
+  .extra-mahjong .mj-side.e .tile, .extra-mahjong .mj-side.w .tile { font-size: 12px; }
+  .extra-mahjong .mj-dis { font-size: 10px; }
+}
+@media (prefers-reduced-motion: reduce) { .extra-mahjong .tile.new, .extra-mahjong .tile.toss { animation: none; } }
+@media (forced-colors: active) {
+  .extra-mahjong button.t[aria-pressed="true"], .extra-mahjong .mj-side.turn .mj-lbl, .extra-mahjong .mj-side.win .mj-lbl {
+    forced-color-adjust: none; background: Highlight; color: HighlightText;
+  }
+}
+
+/* ---- Bridge: four hands around a square table, same grid pattern as .extra-mahjong
+   (scoped to .extra-bridge) ---- */
+.extra-bridge button.t {
+  font: inherit; color: inherit; background: none; border: 0; padding: 0 .5ch;
+  cursor: pointer; line-height: inherit;
+}
+.extra-bridge button.t:hover { outline: 1px solid var(--ink); outline-offset: -1px; }
+.extra-bridge button.t:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.extra-bridge button.t[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+
+.extra-bridge .br-fig {
+  margin: .75em auto; max-width: 680px; aspect-ratio: 1 / 1;
+  display: grid; grid-template-columns: 1.3fr 1.7fr 1.3fr; grid-template-rows: 1fr 1.7fr 1fr;
+  grid-template-areas: ". n ." "w mid e" ". s .";
+  gap: 6px;
+}
+.extra-bridge .br-side {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 3px; min-width: 0; min-height: 0;
+}
+.extra-bridge .br-side.n { grid-area: n; }
+.extra-bridge .br-side.s { grid-area: s; }
+.extra-bridge .br-side.e { grid-area: e; }
+.extra-bridge .br-side.w { grid-area: w; }
+.extra-bridge .br-lbl { font-size: 11px; letter-spacing: .05em; color: var(--muted); padding: 0 .6ch; }
+.extra-bridge .br-side.turn .br-lbl { background: var(--ink); color: var(--paper); }
+.extra-bridge .br-side.declarer .br-lbl { background: var(--amber); color: var(--paper); }
+.extra-bridge .br-side.dummy .br-lbl { outline: 1px solid var(--ink); outline-offset: 1px; }
+.extra-bridge .br-hand { display: flex; flex-direction: column; gap: 1px; font-size: 11px; line-height: 1.4; white-space: nowrap; }
+.extra-bridge .br-suit { display: flex; gap: .5ch; }
+.extra-bridge .br-suit .sy { flex: none; width: 1.6ch; }
+
+.extra-bridge .br-mid {
+  grid-area: mid; position: relative; min-width: 0; min-height: 0;
+  display: grid; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr 1fr;
+  grid-template-areas: ". tn ." "tw info te" ". ts .";
+  gap: 2px; border: 1px solid var(--faint); padding: 4px;
+}
+.extra-bridge .br-trick { display: flex; align-items: center; justify-content: center; min-height: 36px; }
+.extra-bridge .br-trick.n { grid-area: tn; }
+.extra-bridge .br-trick.s { grid-area: ts; }
+.extra-bridge .br-trick.e { grid-area: te; }
+.extra-bridge .br-trick.w { grid-area: tw; }
+.extra-bridge .br-info { grid-area: info; font-size: 10px; text-align: center; color: var(--muted); align-self: center; }
+
+/* Small bordered card, same visual language as the poker exhibits' .cd. */
+.extra-bridge .cd {
+  display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
+  width: 22px; height: 30px; border: 1px solid var(--ink); border-radius: 3px;
+  background: var(--paper); box-shadow: 1px 1px 0 var(--ink);
+  font-size: 10px; font-weight: 400; line-height: 1;
+}
+.extra-bridge .cd i { font-style: normal; font-size: 11px; }
+.extra-bridge .cd.new { animation: extra-bridge-deal .15s steps(3); }
+@keyframes extra-bridge-deal { from { transform: translateY(-4px); opacity: 0; } }
+
+@media (max-width: 680px) {
+  .extra-bridge .br-fig { max-width: 440px; }
+  .extra-bridge .br-hand { font-size: 9px; }
+  .extra-bridge .cd { width: 18px; height: 25px; font-size: 9px; }
+  .extra-bridge .cd i { font-size: 9px; }
+}
+@media (prefers-reduced-motion: reduce) { .extra-bridge .cd.new { animation: none; } }
+@media (forced-colors: active) {
+  .extra-bridge button.t[aria-pressed="true"], .extra-bridge .br-side.turn .br-lbl, .extra-bridge .br-side.declarer .br-lbl {
+    forced-color-adjust: none; background: Highlight; color: HighlightText;
+  }
+}
+
+/* ---- Chess: an 8x8 board replaying a real game (scoped to .extra-chess) ----
+   Unlike .extra-mahjong/.extra-bridge, the squares are plain Unicode chess
+   glyphs (U+2654-265F) — unlike the Mahjong Tiles block, this one has none
+   of the font/emoji problems worked through on mahjong.js's red dragon, so
+   it needs no custom icon. */
+.extra-chess button.t {
+  font: inherit; color: inherit; background: none; border: 0; padding: 0 .5ch;
+  cursor: pointer; line-height: inherit;
+}
+.extra-chess button.t:hover { outline: 1px solid var(--ink); outline-offset: -1px; }
+.extra-chess button.t:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.extra-chess button.t[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+
+.extra-chess .ch-fig { margin: .75em auto; max-width: 480px; }
+.extra-chess .ch-board {
+  display: grid; grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(8, 1fr);
+  aspect-ratio: 1 / 1; border: 1px solid var(--ink);
+}
+.extra-chess .ch-sq {
+  display: flex; align-items: center; justify-content: center;
+  font-size: clamp(22px, 6vw, 40px); line-height: 1;
+}
+.extra-chess .ch-sq.lt { background: var(--paper); }
+.extra-chess .ch-sq.dk { background: var(--faint); }
+.extra-chess .ch-sq.from, .extra-chess .ch-sq.to { box-shadow: inset 0 0 0 2px var(--ink); }
+
+@media (prefers-reduced-motion: reduce) { .extra-chess .ch-sq { transition: none; } }
+@media (forced-colors: active) {
+  .extra-chess button.t[aria-pressed="true"] { forced-color-adjust: none; background: Highlight; color: HighlightText; }
+  .extra-chess .ch-sq.from, .extra-chess .ch-sq.to { forced-color-adjust: none; box-shadow: inset 0 0 0 2px Highlight; }
+}
+
+/* ---- Go: a 19x19 board replaying a real game (scoped to .extra-go) ----
+   Drawn as SVG — a lattice of lines with stones sitting ON the crossings,
+   the way a real board actually looks — rather than CSS grid cells, which
+   read as "one stone per box". Stones are SVG circles, not Unicode glyphs,
+   so their size isn't tied to any font's metrics. */
+.extra-go button.t {
+  font: inherit; color: inherit; background: none; border: 0; padding: 0 .5ch;
+  cursor: pointer; line-height: inherit;
+}
+.extra-go button.t:hover { outline: 1px solid var(--ink); outline-offset: -1px; }
+.extra-go button.t:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.extra-go button.t[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+
+.extra-go .go-fig { margin: .75em auto; max-width: 560px; }
+.extra-go .go-board { background: var(--paper); border: 1px solid var(--ink); line-height: 0; }
+.extra-go .go-svg { display: block; width: 100%; height: auto; }
+.extra-go .go-line { stroke: var(--muted); stroke-width: .035; }
+.extra-go .go-star { fill: var(--ink); }
+.extra-go .go-stone { fill: none; stroke: none; }
+/* Radius is set directly on the <circle> from go.js, not here: the CSS `r`
+   property needs an explicit length unit (px, %, ...) to be valid — a bare
+   number like `.32` silently fails to parse and the rule is dropped, so it
+   never actually overrode the JS-set attribute at all. Black's earlier
+   extra bug (an unset stroke-width defaulting to a full user-unit) is why
+   the two colors ever looked mismatched in the first place; now both get
+   the exact same radius (see go.js's STONE_R) and the same thin boundary,
+   so there's nothing left to throw them out of sync. */
+.extra-go .go-stone.b { fill: var(--ink); stroke: var(--ink); stroke-width: .05; }
+.extra-go .go-stone.w { fill: var(--paper); stroke: var(--ink); stroke-width: .05; }
+
+@media (max-width: 680px) { .extra-go .go-fig { max-width: 400px; } }
+@media (forced-colors: active) {
+  .extra-go button.t[aria-pressed="true"] { forced-color-adjust: none; background: Highlight; color: HighlightText; }
+  .extra-go .go-line, .extra-go .go-star { forced-color-adjust: none; stroke: CanvasText; fill: CanvasText; }
+  .extra-go .go-stone.b { forced-color-adjust: none; fill: CanvasText; stroke: CanvasText; }
+  .extra-go .go-stone.w { forced-color-adjust: none; fill: Canvas; stroke: CanvasText; }
+}

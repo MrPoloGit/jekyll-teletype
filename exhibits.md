@@ -19,6 +19,7 @@ extra_js:
 # Exhibits
 
 [← Back to the main page]({{ "/" | relative_url }}){: .apply}
+[See the extra exhibits →]({{ "/extra-exhibit/" | relative_url }}){: .apply}
 
 Ported, one at a time, from the source page's bespoke animations/diagrams —
 see "Exhibits porting roadmap" in `plan.md` for the full list and status.
