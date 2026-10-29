@@ -1,0 +1,174 @@
+---
+layout: null
+---
+{% assign c = site.theme_config %}
+{% assign light = c.colors %}
+{% assign dark = c.screen_colors %}
+{% assign gw = c.gutter.width %}
+{% assign go = c.gutter.offset %}
+
+/* Generated from _config.yml: theme_config. Edit the config, not this file. */
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+
+:root {
+  --ink: {{ light.ink }};
+  --paper: {{ light.paper }};
+  --gutter: {{ light.gutter }};
+  --faint: {{ light.faint }};
+  --muted: {{ light.muted }};
+  --amber: {{ light.amber }};
+  --green: {{ light.green }};
+  --warn: {{ light.warn }};
+  --red: {{ light.red }};
+  --mono: {{ c.mono_font }};
+  --lh: {{ c.line_height }};
+}
+
+body {
+  margin: 0; background: var(--paper); color: var(--ink);
+  font-family: var(--mono); font-size: 15px; line-height: var(--lh);
+}
+a { color: inherit; }
+b, strong, th, h1, h2, h3, h4, h5, h6 { font-weight: 400; }
+
+/* ---- focus: a square, 2px, ink-colored outline on anything focusable —
+   never the browser's default rounded ring ---- */
+.doc :is(input, textarea, select, button, a, [tabindex]):focus-visible {
+  outline: 2px solid var(--ink); outline-offset: 2px; border-radius: 0;
+}
+.doc :is(input, textarea, select, button) { border-radius: 0; appearance: none; -webkit-appearance: none; }
+
+/* ---- document scaffold: one running line count for the whole page ---- */
+.doc { counter-reset: ln; padding: 48px 0 0; }
+.sheet {
+  max-width: {{ c.max_width_ch }}ch; margin: 0 auto;
+{% if c.gutter.show %}
+  padding: 0 24px 0 calc({{ go }}ch + 2ch);
+{% else %}
+  padding: 0 24px;
+{% endif %}
+}
+
+/* Every direct child of .sheet is a numbered row — except dl, whose dt rows are
+   numbered individually instead (see the kv/tx rules below). */
+.sheet > :not(dl) { counter-increment: ln; position: relative; }
+.sheet dl > dt { counter-increment: ln; position: relative; }
+
+{% if c.gutter.show %}
+.sheet > :not(dl)::before, .sheet dl > dt::before {
+  content: counter(ln); position: absolute; left: -{{ go }}ch; width: {{ gw }}ch;
+  text-align: right; font-size: 10px; color: var(--gutter); top: .55em;
+}
+{% endif %}
+
+/* ---- headings ---- */
+.sheet > h1 {
+  display: inline-block; font: inherit; font-weight: 400; margin: 0;
+  background: var(--ink); color: var(--paper); border: 1px solid var(--ink); padding: 0 1.5ch;
+}
+.sheet > h2 {
+  text-align: center; text-transform: uppercase; font-weight: 400; margin: 0;
+}
+.sheet > :is(h3, h4, h5, h6) {
+  text-transform: uppercase; font-weight: 400; margin: 0;
+}
+
+/* a paragraph (or anything) marked {: .notice} reads in capitals like system text */
+.doc .notice { text-transform: uppercase; }
+
+/* ---- full-width section break: a literal run of "=", clipped to the column ---- */
+.sheet > hr {
+  border: 0; margin: 0; padding: 0; height: calc(var(--lh) * 1em); position: relative;
+}
+.sheet > hr::after {
+  content: "============================================================================================================================================================================================================================================================================================================================================";
+  position: absolute; inset: 0; overflow: hidden; white-space: nowrap; color: var(--ink);
+}
+
+/* ---- buttons / CTAs: [text](url){: .apply} or {: .cta} ---- */
+.doc a.apply, .doc a.cta {
+  display: inline-block; text-decoration: none; font-weight: 400;
+  border: 1px solid var(--ink); padding: 0 1.5ch; margin: -1px 0;
+}
+.doc a.apply:hover, .doc a.apply:focus-visible { background: var(--ink); color: var(--paper); }
+.doc a.cta { background: var(--ink); color: var(--paper); }
+
+/* ---- kv / tx rows: a markdown definition list ----
+   Term
+   : Definition
+   renders right-aligned (dates, stats). Add {: .kv} after the list for a
+   left-aligned, fixed-width label column instead (field-style rows). */
+.sheet dl {
+  display: grid; grid-template-columns: 1fr auto; column-gap: 2ch; row-gap: 0;
+  margin: 0; text-transform: uppercase;
+}
+.sheet dl dt { font-weight: 400; }
+.sheet dl dd { margin: 0; text-align: right; }
+.sheet dl.kv { grid-template-columns: 22ch 1fr; text-transform: none; }
+.sheet dl.kv dd { text-align: left; }
+
+/* ---- inverted panel: ::: screen ... ::: in markdown ---- */
+.screen {
+  color-scheme: dark;
+  --ink: {{ dark.ink }}; --paper: {{ dark.paper }}; --gutter: {{ dark.gutter }};
+  --faint: {{ dark.faint }}; --muted: {{ dark.muted }};
+  background: var(--paper); color: var(--ink);
+  padding: calc(var(--lh) * 1em) 0;
+}
+.screen:last-child { padding-bottom: calc(var(--lh) * 3em); }
+
+/* ---- forms: a plain <form data-api="/api/path"> posted by assets/js/forms.js ---- */
+.doc input, .doc textarea, .doc select, .doc button { font: inherit; color: inherit; }
+.doc :is(input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="url"], textarea) {
+  background: transparent; width: 100%; border: 0; border-bottom: 1px solid var(--ink);
+  border-radius: 0; padding: 0 .5ch; line-height: inherit;
+}
+.doc textarea { border: 1px solid var(--ink); resize: vertical; display: block; }
+.doc select {
+  width: 100%; cursor: pointer; border: 0; border-bottom: 1px solid var(--ink); padding: 0 .5ch;
+  background: transparent;
+}
+.doc button[type="submit"] {
+  background: none; border: 1px solid var(--ink); padding: 0 1.5ch; cursor: pointer;
+}
+.doc button[type="submit"]:hover { background: var(--ink); color: var(--paper); }
+.doc button[type="submit"]:disabled { opacity: .5; cursor: default; }
+/* toggled by assets/js/forms.js; both start hidden via the [hidden] attribute in markup */
+.doc [data-error] { background: var(--warn); color: var(--ink); padding: 0 .5ch; }
+
+/* ---- radio / checkbox groups: real inputs, drawn as "( )" / "(X)" text ----
+   both <input type="radio"> and <input type="checkbox"> render the same way
+   (a deliberate simplification of the source page, which used "[ ]"/"[X]"
+   for checkboxes) — pick one in markdown with plain HTML:
+
+   <span class="opts">
+     <label class="opt"><input type="radio" name="heard" value="club"><span class="box"></span>University club</label>
+     <label class="opt"><input type="checkbox" name="terms" required><span class="box"></span>I agree</label>
+   </span>
+
+   FormData (and so forms.js) reads these exactly like any other form field —
+   nothing about how they're drawn changes how they submit. */
+.doc .opts { display: flex; flex-wrap: wrap; column-gap: 3ch; row-gap: .3em; }
+.doc .opt {
+  position: relative; display: inline-flex; align-items: baseline; column-gap: 1ch;
+  cursor: pointer; white-space: nowrap;
+}
+/* the real input stays in the DOM (so it still submits, tabs, and gets the
+   focus-visible outline above) but is visually replaced by .box */
+.doc .opt input { position: absolute; width: 1px; height: 1px; opacity: 0; margin: 0; }
+.doc .opt .box::before { content: "( )"; white-space: pre; }
+.doc .opt input:checked + .box::before { content: "(X)"; }
+.doc .opt:hover { text-decoration: underline; text-decoration-color: currentColor; }
+
+/* ---- banner: a solid-color band behind just a run of text ----
+   An inline span, not a block IAL: it must sit INSIDE a normal, full-width
+   row (e.g. a centered <h2>) so that row's own gutter number stays anchored
+   to the row's left edge. Styling the whole heading block instead (shrinking
+   it to content width) pulls the number along with it, off the gutter. */
+.doc .banner { display: inline-block; padding: 0 1.5ch; }
+.doc .banner.amber { background: var(--amber); color: var(--paper); }
+.doc .banner.green { background: var(--green); color: var(--ink); }
+
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }

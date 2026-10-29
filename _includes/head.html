@@ -1,0 +1,14 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% if page.title %}{{ page.title }} — {% endif %}{{ site.title }}</title>
+{% if page.description %}<meta name="description" content="{{ page.description }}">{% elsif site.description %}<meta name="description" content="{{ site.description }}">{% endif %}
+
+<link rel="preconnect" href="https://fonts.googleapis.com/">
+<link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
+
+<script>window.THEME = { apiBase: {{ site.theme_config.api.base_url | jsonify }} };</script>
+<script src="{{ '/assets/js/api.js' | relative_url }}" defer></script>
+<script src="{{ '/assets/js/bind.js' | relative_url }}" defer></script>
+<script src="{{ '/assets/js/forms.js' | relative_url }}" defer></script>

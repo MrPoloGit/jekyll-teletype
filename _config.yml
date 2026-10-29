@@ -1,0 +1,59 @@
+title: Printed Transcript
+description: A Jekyll theme for the "printed transcript" look — monospace, numbered lines, two-tone ink/paper colors that invert in screen panels.
+
+markdown: kramdown
+kramdown:
+  input: GFM
+  hard_wrap: false
+
+plugins:
+  - jekyll-sass-converter
+
+# ---------------------------------------------------------------------------
+# theme_config: the ONLY place the look is tuned. Every value here is read by
+# assets/css/main.css (which Jekyll runs through Liquid before writing it out).
+# ---------------------------------------------------------------------------
+theme_config:
+  mono_font: "'Source Code Pro', ui-monospace, Menlo, monospace"
+  line_height: 1.8
+  max_width_ch: 96
+
+  gutter:
+    show: true    # turn the whole numbered column on/off, site-wide
+    width: 3.2     # ch — width reserved for the number itself
+    offset: 5      # ch — how far left of the text column the number sits
+
+  # the light ("paper") palette — used everywhere outside a ::: screen ::: block
+  colors:
+    ink: "#111111"
+    paper: "#ffffff"
+    gutter: "#8a8a8a"
+    faint: "#c9c9c9"
+    muted: "#595959"
+    amber: "#b06300"
+    green: "#0cab2c"
+    warn: "#ffc400"
+    red: "#d0141e"
+
+  # the dark palette used inside ::: screen ::: blocks — same roles, inverted
+  screen_colors:
+    ink: "#f2f2f2"
+    paper: "#0a0a0a"
+    gutter: "#747474"
+    faint: "#3d3d3d"
+    muted: "#a6a6a6"
+
+  # where the frontend's fetch/form helpers send requests. "" means same-origin
+  # (paths like "/api/stats" resolve against the page's own host) — set this
+  # to a full origin ("https://api.example.com") if the backend lives elsewhere,
+  # and make sure that backend sends CORS headers, since the site itself is
+  # static and has no server to proxy through.
+  api:
+    base_url: "http://127.0.0.1:5050"   # jekyll-teletype-backend, for local testing
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - plan.md
+  - "No Limit_ A Bot Building Tournament.html"
+  - vendor
