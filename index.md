@@ -1,6 +1,6 @@
 ---
 layout: page
-title: Printed Transcript
+title: Demo
 description: Example page for the printed-transcript Jekyll theme.
 ---
 

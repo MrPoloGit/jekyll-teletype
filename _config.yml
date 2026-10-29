@@ -1,4 +1,4 @@
-title: Printed Transcript
+title: Jekyll Teletype
 description: A Jekyll theme for the "printed transcript" look — monospace, numbered lines, two-tone ink/paper colors that invert in screen panels.
 
 baseurl: /jekyll-teletype
@@ -18,7 +18,7 @@ plugins:
 theme_config:
   # path to a favicon file under the site (e.g. an SVG, PNG, or .ico you've
   # dropped in assets/) — leave "" for no icon at all
-  favicon: ""
+  favicon: "/assets/favicon.svg"
 
   mono_font: "'Source Code Pro', ui-monospace, Menlo, monospace"
   line_height: 1.8
