@@ -185,19 +185,18 @@ b, strong, th, h1, h2, h3, h4, h5, h6 { font-weight: 400; }
 .doc .banner.amber { background: var(--amber); color: var(--paper); }
 .doc .banner.green { background: var(--green); color: var(--ink); }
 
-/* ---- mobile: shrink the gutter and side padding so the numbered column
-   doesn't eat the little width a phone screen has to give ---- */
+/* ---- mobile: the numbered gutter is sized against its own 10px font,
+   while .sheet's padding is sized against the body font — on a phone there
+   isn't enough room between them to keep both safely apart (any font-metric
+   wobble, like the fallback font flashing before the web font loads, tips it
+   into overlapping the text), so the gutter is dropped instead of shrunk. ---- */
 @media (max-width: 600px) {
-  :root { --gutter-width: 2ch; --gutter-offset: 2.5ch; }
   body { font-size: 14px; }
   .doc { padding: 32px 0 0; }
-  .sheet { padding-right: 12px; }
-  .wide { padding: 0 12px; }
+  .sheet { padding: 0 16px; }
+  .wide { padding: 0 16px; }
   .sheet dl.kv { grid-template-columns: 14ch 1fr; }
-}
-
-@media (max-width: 400px) {
-  :root { --gutter-width: 0ch; --gutter-offset: 1.2ch; }
+  .sheet > :not(dl)::before, .sheet dl > dt::before { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
