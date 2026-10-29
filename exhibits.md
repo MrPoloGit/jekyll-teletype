@@ -1,6 +1,7 @@
 ---
 layout: page
 title: Exhibits
+permalink: /exhibits/
 description: Ported animations and diagrams from the source page — see plan.md's roadmap.
 extra_css:
   - /assets/css/exhibits.css
