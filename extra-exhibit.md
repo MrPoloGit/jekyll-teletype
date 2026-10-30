@@ -38,7 +38,7 @@ scoring — just the draw/discard loop.
 <div class="row">ROUND <span id="mj-round">1</span><span>WALL <span id="mj-wall">70</span> LEFT</span></div>
 
 <div class="row"><span id="mj-turn">NORTH</span>'S TURN<span>
-<button class="t" id="mj-play" aria-label="Pause">[PAUSE]</button><button class="t" id="mj-next" aria-label="Next turn">[&gt;]</button>
+<button class="t" id="mj-back" aria-label="Previous turn">[&lt;]</button><button class="t" id="mj-play" aria-label="Pause">[PAUSE]</button><button class="t" id="mj-next" aria-label="Next turn">[&gt;]</button>
 SPEED
 <button class="t" data-speed="1" aria-pressed="false">1x</button><button class="t" data-speed="4" aria-pressed="false">4x</button><button class="t" data-speed="8" aria-pressed="true">8x</button><button class="t" data-speed="16" aria-pressed="false">16x</button>
 </span></div>

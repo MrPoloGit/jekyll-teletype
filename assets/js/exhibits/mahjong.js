@@ -18,34 +18,111 @@
 // Markup it expects (see extra-exhibit.md): a <section id="mj"> containing
 // #mj-table (figure) with four #mj-side-{n,e,s,w} (each wrapping a .mj-lbl
 // and #mj-h-{n,e,s,w}) and four #mj-d-{n,e,s,w} discard piles, #mj-turn,
-// #mj-wall, #mj-round, #mj-play, #mj-next, and [data-speed] buttons.
+// #mj-wall, #mj-round, #mj-play, #mj-back, #mj-next, and [data-speed] buttons.
 (() => {
   "use strict";
 
-  // Unicode's Mahjong Tiles block happens to lay out exactly the 34 tile
-  // kinds this needs (no flowers/seasons) as 34 consecutive code points:
-  // U+1F000-1F003 winds (E S W N), U+1F004-1F006 dragons (red/green/white),
-  // U+1F007-1F00F characters 1-9, U+1F010-1F018 bamboo 1-9, U+1F019-1F021
-  // circles 1-9 — so the glyph for tile type t is just code point 0x1F000+t.
-  // The red dragon (U+1F004) is the one tile in this block Unicode marks
-  // Emoji_Presentation=Yes by default, so most fonts draw it as a colorful
-  // image while its 33 neighbors stay plain monochrome glyphs from the same
-  // symbol font — two attempts at a text substitute (a CJK "中", then a
-  // U+FE0E text-presentation request on the same code point) both still
-  // came out looking wrong in practice. Fixed for real by not depending on
-  // any font for this one tile at all: a small hand-drawn inline SVG below,
-  // styled like the other glyphs' tile-with-a-mark look (outline + a simple
-  // center stroke standing in for 中, the character on a real red dragon
-  // tile) and colored with currentColor/var(--paper) so it inverts correctly
-  // in a ::: screen ::: block exactly like the rest of the theme's icons.
+  // Tiles are drawn as small bordered boxes containing a hand-built SVG
+  // icon — the suits get real pip-style designs (pin = dots, sou = bamboo
+  // sticks, man = a big numeral), not just a text abbreviation — rather
+  // than any Unicode glyph block. The Mahjong Tiles block (U+1F000-1F021)
+  // was tried first; its red dragon character defaults to emoji
+  // presentation in most fonts while its 33 neighbors don't, and multiple
+  // font-based/SVG-icon fixes for just that one tile each took several
+  // rounds to get right (see plan.md). Rather than keep patching a single
+  // glyph, every tile here now avoids Unicode symbol blocks entirely —
+  // circles/bars are plain SVG shapes, numerals are plain digits set with
+  // an SVG <text> (which inherits the page's own monospace font, same as
+  // any other text here, so still zero font-coverage risk).
   const N_TYPES = 34;
-  const GLYPH = Array.from({ length: N_TYPES }, (_, t) => String.fromCodePoint(0x1f000 + t));
-  const RED_DRAGON = 4;
-  const RED_DRAGON_ICON = '<svg viewBox="0 0 24 32" aria-hidden="true" focusable="false">' +
-    '<rect x="1.5" y="1.5" width="21" height="29" rx="2" fill="var(--paper)" stroke="currentColor" stroke-width=".95"/>' +
-    '<rect x="3" y="3.5" width="18" height="25" fill="none" stroke="currentColor" stroke-width=".95"/>' +
-    '<line x1="12" y1="3" x2="12" y2="29" stroke="currentColor" stroke-width=".95"/>' +
-    '</svg>';
+  // Still used as each tile's accessible name (aria-label) even though the
+  // visible content is now an icon, not text.
+  const LABELS = [
+    "East wind", "South wind", "West wind", "North wind",
+    "Red dragon", "Green dragon", "White dragon",
+    ...Array.from({ length: 9 }, (_, i) => (i + 1) + " characters"),
+    ...Array.from({ length: 9 }, (_, i) => (i + 1) + " bamboo"),
+    ...Array.from({ length: 9 }, (_, i) => (i + 1) + " circles"),
+  ];
+
+  // Dice/card-style pip layouts (fractional x,y within the tile), shared by
+  // both suits that show "N marks" (pin's dots, sou's sticks) — not the
+  // exact traditional arrangement for every number, but a systematic,
+  // recognizable "this many" layout, same spirit as the simplified rule set
+  // elsewhere in this file.
+  const PIPS = {
+    1: [[.5, .5]],
+    2: [[.3, .3], [.7, .7]],
+    3: [[.3, .25], [.5, .5], [.7, .75]],
+    4: [[.3, .25], [.7, .25], [.3, .75], [.7, .75]],
+    5: [[.3, .25], [.7, .25], [.5, .5], [.3, .75], [.7, .75]],
+    6: [[.3, .2], [.7, .2], [.3, .5], [.7, .5], [.3, .8], [.7, .8]],
+    7: [[.3, .15], [.7, .15], [.3, .4], [.7, .4], [.5, .58], [.3, .85], [.7, .85]],
+    8: [[.3, .15], [.7, .15], [.3, .38], [.7, .38], [.3, .62], [.7, .62], [.3, .85], [.7, .85]],
+    9: [[.22, .2], [.5, .2], [.78, .2], [.22, .5], [.5, .5], [.78, .5], [.22, .8], [.5, .8], [.78, .8]],
+  };
+  const TILE_W = 24, TILE_H = 32; // SVG viewBox units for every tile icon below
+  const svgOpen = `viewBox="0 0 ${TILE_W} ${TILE_H}" aria-hidden="true" focusable="false"`;
+
+  // Pin (circles): N filled dots.
+  function pinIcon(n) {
+    const r = n <= 3 ? 2.6 : n <= 6 ? 2.2 : 1.9;
+    const dots = PIPS[n].map(([fx, fy]) =>
+      `<circle cx="${(2 + fx * (TILE_W - 4)).toFixed(1)}" cy="${(2 + fy * (TILE_H - 4)).toFixed(1)}" r="${r}" fill="currentColor"/>`
+    ).join("");
+    return `<svg ${svgOpen}>${dots}</svg>`;
+  }
+  // Sou (bamboo): N short vertical bars, same layout as pin's dots.
+  function souIcon(n) {
+    // Thinner and noticeably longer than a pin dot (so the two suits read
+    // as "sticks" vs "circles" at a glance, not just "big dot vs small
+    // dot") — capped per tier so denser layouts (7-9, stacked closer
+    // together) don't let adjacent bars touch or merge.
+    const w = 1.8, h = n <= 3 ? 10 : n <= 6 ? 6.5 : 4.8;
+    const bars = PIPS[n].map(([fx, fy]) => {
+      const cx = 2 + fx * (TILE_W - 4), cy = 2 + fy * (TILE_H - 4);
+      return `<rect x="${(cx - w / 2).toFixed(1)}" y="${(cy - h / 2).toFixed(1)}" width="${w}" height="${h}" rx="1" fill="currentColor"/>`;
+    }).join("");
+    return `<svg ${svgOpen}>${bars}</svg>`;
+  }
+  // Man (characters): the real pair printed on a physical tile — a big
+  // Chinese numeral over 萬 ("ten thousand", what gives the suit its
+  // Western name "characters"/"wan"). Earlier version stood in with an
+  // Arabic numeral + "WAN" to avoid any CJK text; now that every tile is
+  // its own self-contained SVG (not a glyph expected to match 33 neighbors
+  // from one shared font, which is what made the Mahjong Tiles block's
+  // inconsistent coverage a problem in the first place), a CJK fallback
+  // font for just this text is no longer a mismatch risk — there's nothing
+  // adjacent it needs to match anymore. CJK Unified Ideographs is also a
+  // universally-covered block (every OS ships a CJK font), nothing like
+  // the sparse symbol block the red dragon saga was about.
+  const CN_NUM = ["一", "二", "三", "四", "五", "六", "七", "八", "九"];
+  function manIcon(n) {
+    return `<svg ${svgOpen}>` +
+      `<text x="${TILE_W / 2}" y="13" text-anchor="middle" dominant-baseline="middle" font-size="13" fill="currentColor">${CN_NUM[n - 1]}</text>` +
+      `<text x="${TILE_W / 2}" y="25" text-anchor="middle" dominant-baseline="middle" font-size="13" fill="currentColor">萬</text>` +
+      `</svg>`;
+  }
+  function windIcon(char) {
+    return `<svg ${svgOpen}><text x="${TILE_W / 2}" y="${TILE_H / 2 + 1}" text-anchor="middle" dominant-baseline="middle" font-size="16" fill="currentColor">${char}</text></svg>`;
+  }
+  // Dragons: the real characters (中/發), in their traditional red/green
+  // ink, same reasoning as manIcon above. White stays blank — real white
+  // dragon tiles usually are too, often with just a plain frame.
+  function dragonIcon(t) {
+    if (t === 6) return `<svg ${svgOpen}><rect x="4" y="3" width="${TILE_W - 8}" height="${TILE_H - 6}" fill="none" stroke="var(--ink)" stroke-width="1"/></svg>`;
+    const char = t === 4 ? "中" : "發";
+    const color = t === 4 ? "var(--red)" : "var(--green)";
+    return `<svg ${svgOpen}><text x="${TILE_W / 2}" y="${TILE_H / 2 + 1}" text-anchor="middle" dominant-baseline="middle" font-size="17" fill="${color}">${char}</text></svg>`;
+  }
+  function tileIcon(t) {
+    if (t <= 3) return windIcon("東南西北"[t]);
+    if (t <= 6) return dragonIcon(t);
+    if (t <= 15) return manIcon(t - 6);
+    if (t <= 24) return souIcon(t - 15);
+    return pinIcon(t - 24);
+  }
+
   const SIDES = ["n", "e", "s", "w"];
   const SIDE_NAME = { n: "NORTH", e: "EAST", s: "SOUTH", w: "WEST" };
 
@@ -151,13 +228,22 @@
   // empties the wall, the round ends as an exhaustive draw. Either ending
   // reshuffles for the next round before this function returns, so the
   // very next turn's events already belong to the new round.
+  //
+  // Every event carries a full snapshot of all 4 hands and all 4 discard
+  // piles (not just the delta for the acting seat) — this is what lets
+  // show() below render ANY event correctly regardless of which direction
+  // playback is moving, so stepping backward through history (the "Back"
+  // button) is just re-rendering a stored snapshot, the same way
+  // chess.js/go.js already replay their own fixed move lists in either
+  // direction.
   function turnEvents() {
     const seat = turn, tile = wall.pop();
     hands[seat].push(tile);
     hands[seat].sort(cmp);
-    const drawn = { type: "draw", seat, tile, hand: hands[seat].slice(), wall: wall.length, round: roundNo };
+    const snap = () => ({ hands: hands.map(h => h.slice()), discards: discards.map(d => d.slice()) });
+    const drawn = { type: "draw", seat, tile, wall: wall.length, round: roundNo, ...snap() };
     if (isWinningHand(hands[seat])) {
-      const won = { type: "win", seat, hand: hands[seat].slice(), wall: wall.length, round: roundNo };
+      const won = { type: "win", seat, wall: wall.length, round: roundNo, ...snap() };
       resetRound();
       return [drawn, won];
     }
@@ -165,10 +251,10 @@
     const out = hands[seat][idx];
     hands[seat].splice(idx, 1);
     discards[seat].push(out);
-    const discarded = { type: "discard", seat, tile: out, hand: hands[seat].slice(), wall: wall.length, round: roundNo };
+    const discarded = { type: "discard", seat, tile: out, wall: wall.length, round: roundNo, ...snap() };
     turn = (turn + 1) % 4;
     if (wall.length === 0) {
-      const over = { type: "wallout", round: roundNo };
+      const over = { type: "wallout", round: roundNo, ...snap() };
       resetRound();
       return [drawn, discarded, over];
     }
@@ -181,10 +267,7 @@
 
   const sideEls = {}, handEls = {}, disEls = {};
   for (const s of SIDES) { sideEls[s] = $("mj-side-" + s); handEls[s] = $("mj-h-" + s); disEls[s] = $("mj-d-" + s); }
-  const tileHTML = (t, cls) => {
-    const classes = t === RED_DRAGON ? "tile rd" : "tile";
-    return `<span class="${classes}${cls ? " " + cls : ""}">${t === RED_DRAGON ? RED_DRAGON_ICON : GLYPH[t]}</span>`;
-  };
+  const tileHTML = (t, cls) => `<span class="mj-tile${cls ? " " + cls : ""}" aria-label="${LABELS[t]}">${tileIcon(t)}</span>`;
 
   function renderHand(side, hand, newTile) {
     let used = false;
@@ -203,38 +286,31 @@
     SIDES.forEach(s => sideEls[s].classList.remove("turn", "win"));
   }
 
-  // A round-ending event (win/wallout) already reshuffled the data for the
-  // NEXT round by the time it's shown, so the fresh deal is only painted
-  // once the following "draw" event arrives — see its `fresh` flag below.
+  // Renders an event purely from its own stored snapshot (every event's
+  // `hands`/`discards` — see turnEvents() above), never from the live
+  // `hands`/`discards` globals — so this works identically whether it's
+  // the newest event just generated or an older one being re-shown after
+  // stepping backward in history.
   function show(e) {
-    if (e.type === "win") {
-      clearHighlights();
-      renderHand(SIDES[e.seat], e.hand);
-      sideEls[SIDES[e.seat]].classList.add("win");
-      $("mj-turn").textContent = SIDE_NAME[SIDES[e.seat]] + " WINS!";
-      $("mj-wall").textContent = e.wall;
-      $("mj-round").textContent = e.round;
-      return;
-    }
-    if (e.type === "wallout") {
-      clearHighlights();
-      $("mj-turn").textContent = "WALL EMPTY — ROUND OVER";
-      $("mj-wall").textContent = 0;
-      $("mj-round").textContent = e.round;
-      return;
-    }
-    if (e.fresh) { renderAllHands(); renderAllDiscards(); }
-    const side = SIDES[e.seat];
-    if (e.type === "draw") {
-      renderHand(side, e.hand, e.tile);
-    } else {
-      renderHand(side, e.hand);
-      disEls[side].insertAdjacentHTML("beforeend", tileHTML(e.tile, "toss"));
+    SIDES.forEach((s, i) => {
+      const newTile = e.type === "draw" && i === e.seat ? e.tile : undefined;
+      renderHand(s, e.hands[i], newTile);
+    });
+    SIDES.forEach((s, i) => { disEls[s].innerHTML = e.discards[i].map(t => tileHTML(t)).join(""); });
+    if (e.type === "discard" && disEls[SIDES[e.seat]].lastElementChild) {
+      disEls[SIDES[e.seat]].lastElementChild.classList.add("toss");
     }
     clearHighlights();
-    sideEls[side].classList.add("turn");
-    $("mj-turn").textContent = SIDE_NAME[side];
-    $("mj-wall").textContent = e.wall;
+    if (e.type === "win") {
+      sideEls[SIDES[e.seat]].classList.add("win");
+      $("mj-turn").textContent = SIDE_NAME[SIDES[e.seat]] + " WINS!";
+    } else if (e.type === "wallout") {
+      $("mj-turn").textContent = "WALL EMPTY — ROUND OVER";
+    } else {
+      sideEls[SIDES[e.seat]].classList.add("turn");
+      $("mj-turn").textContent = SIDE_NAME[SIDES[e.seat]];
+    }
+    $("mj-wall").textContent = e.type === "wallout" ? 0 : e.wall;
     $("mj-round").textContent = e.round;
   }
 
@@ -242,22 +318,39 @@
   const BASE = { 1: 900, 4: 320, 8: 160, 16: 70 }; // ms an event sits on screen
   const WAIT_MULT = { draw: 0.55, discard: 1, win: 3, wallout: 2.2 };
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  let speed = 8, paused = reduce, inView = true, timer = 0, queue = [], qi = 0, prevWasEnd = false;
+  let speed = 8, paused = reduce, inView = true, timer = 0, queue = [], qi = 0;
 
   const running = () => !paused && inView && !document.hidden;
 
   function next() {
     if (qi >= queue.length) { queue = turnEvents(); qi = 0; }
-    const e = queue[qi++];
-    if (prevWasEnd && e.type === "draw") e.fresh = true;
-    prevWasEnd = e.type === "win" || e.type === "wallout";
-    return e;
+    return queue[qi++];
   }
+
+  // Every shown event is kept here so "Back" can re-display an earlier one
+  // without un-doing any game state (the wall/hands/discards globals only
+  // ever move forward — see turnEvents()). advance() replays from history
+  // first if it's behind the frontier (so Back then Play resumes through
+  // what already happened instead of generating something new), and only
+  // calls next() once it's caught back up. Capped so a long-running page
+  // doesn't grow this forever.
+  let history = [], historyIndex = -1;
+  function advance() {
+    if (historyIndex < history.length - 1) {
+      historyIndex++;
+    } else {
+      history.push(next());
+      if (history.length > 1000) { history.shift(); historyIndex--; }
+      historyIndex = history.length - 1;
+    }
+    return history[historyIndex];
+  }
+
   const waitAfter = e => BASE[speed] * WAIT_MULT[e.type];
   function tick() {
     timer = 0;
     if (!running()) return;
-    const e = next();
+    const e = advance();
     show(e);
     timer = setTimeout(tick, waitAfter(e));
   }
@@ -269,10 +362,17 @@
     playBtn.setAttribute("aria-label", paused ? "Play" : "Pause");
   }
   playBtn.addEventListener("click", () => { paused = !paused; syncPlay(); kick(); });
+  $("mj-back").addEventListener("click", () => {
+    if (historyIndex <= 0) return; // nothing earlier recorded yet
+    paused = true; syncPlay();
+    clearTimeout(timer); timer = 0;
+    historyIndex--;
+    show(history[historyIndex]);
+  });
   $("mj-next").addEventListener("click", () => {
     paused = true; syncPlay();
     clearTimeout(timer); timer = 0;
-    show(next());
+    show(advance());
   });
   const speedBtns = document.querySelectorAll("#mj [data-speed]");
   speedBtns.forEach(b => b.addEventListener("click", () => {

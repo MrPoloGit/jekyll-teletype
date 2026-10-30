@@ -38,25 +38,34 @@
 .extra-mahjong .mj-side.n .mj-hand, .extra-mahjong .mj-side.s .mj-hand {
   flex-direction: row; flex-wrap: wrap; justify-content: center; max-width: 100%;
 }
-.extra-mahjong .mj-side.e .mj-hand, .extra-mahjong .mj-side.w .mj-hand { flex-direction: column; align-items: center; }
-.extra-mahjong .tile { font-size: 20px; line-height: 1; }
-.extra-mahjong .mj-side.e .tile, .extra-mahjong .mj-side.w .tile { font-size: 15px; }
-/* The red dragon is a hand-drawn SVG, not a font glyph (see mahjong.js) —
-   sized/aligned in em so it tracks the other tiles' font-size. A font-metric
-   measurement (PIL against Apple Symbols.ttf) turned out unreliable as a
-   source of truth here, so this is tuned by eye against screenshots of the
-   real glyphs on the actual page instead. The real tiles' boxes sit flush
-   against their neighbors with no extra gap of their own, so this one
-   relies on .mj-hand's flex `gap` too instead of adding its own margin.
-   IMPORTANT: width:height here must stay at the SVG's own viewBox ratio
-   (24:32 = 0.75). Mismatching them doesn't stretch the art (SVG's default
-   preserveAspectRatio scales it uniformly) — it letterboxes, leaving blank
-   space inside the box on whichever axis isn't the binding constraint. The
-   last few rounds of "too much space on the sides" were this, not the
-   inner-shape padding in mahjong.js. */
-.extra-mahjong .tile.rd svg { display: inline-block; width: .75em; height: 1em; vertical-align: -.3em; }
-.extra-mahjong .tile.new { animation: extra-mahjong-deal .15s steps(3); }
-.extra-mahjong .tile.toss { animation: extra-mahjong-deal .15s steps(3); }
+/* Same tile size/shape as the N/S rows (below) — east/west used to render
+   noticeably smaller, which read as two different tile designs depending
+   on which side of the table they were on. Wrapping into columns (instead
+   of one tall single column, or shrinking the tiles) is what keeps 14 of
+   them inside the side's share of the table without needing a second,
+   smaller tile size: height caps each column at ~7 tiles tall, then a new
+   column starts beside it. */
+.extra-mahjong .mj-side.e .mj-hand, .extra-mahjong .mj-side.w .mj-hand {
+  flex-direction: column; flex-wrap: wrap; align-content: center; justify-content: flex-start; max-height: 190px;
+}
+/* Every tile is a small bordered box containing a hand-built SVG icon (see
+   mahjong.js's pinIcon/souIcon/manIcon/windIcon/dragonIcon) — the same
+   `.cd`-style box the poker/bridge exhibits use for cards, now with a real
+   per-suit design (pin = dots, sou = bamboo bars, man = a big numeral)
+   instead of a Unicode glyph, so there's no font/emoji-presentation risk
+   left to tune for any of the 34 tile kinds (that was the entire red
+   dragon saga: see plan.md) — dragon/suit colors are plain SVG fills, not
+   a font dependency of any kind. One size for every hand regardless of
+   which side of the table it's on — see the column-wrap rule above for how
+   east/west fit the same size tiles. */
+.extra-mahjong .mj-tile {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 18px; height: 24px; border: 1px solid var(--ink); border-radius: 2px;
+  background: var(--paper); box-shadow: 1px 1px 0 var(--ink);
+}
+.extra-mahjong .mj-tile svg { width: 100%; height: 100%; display: block; }
+.extra-mahjong .mj-tile.new { animation: extra-mahjong-deal .15s steps(3); }
+.extra-mahjong .mj-tile.toss { animation: extra-mahjong-deal .15s steps(3); }
 @keyframes extra-mahjong-deal { from { transform: translateY(-4px); opacity: 0; } }
 
 .extra-mahjong .mj-mid {
@@ -67,8 +76,12 @@
 }
 .extra-mahjong .mj-dis {
   display: flex; flex-wrap: wrap; align-content: flex-start; justify-content: center;
-  gap: 1px; font-size: 13px; min-width: 0; min-height: 0; overflow: hidden;
+  gap: 1px; min-width: 0; min-height: 0; overflow: hidden;
 }
+/* Smaller still: a discard pile can hold far more tiles than any one hand
+   (up to ~17 per seat across a round), in a quarter of the already-small
+   center area. */
+.extra-mahjong .mj-dis .mj-tile { width: 12px; height: 16px; box-shadow: none; }
 .extra-mahjong .mj-dis.n { grid-area: dn; }
 .extra-mahjong .mj-dis.s { grid-area: ds; }
 .extra-mahjong .mj-dis.e { grid-area: de; }
@@ -77,15 +90,16 @@
 
 @media (max-width: 680px) {
   .extra-mahjong .mj-fig { max-width: 420px; }
-  .extra-mahjong .tile { font-size: 15px; }
-  .extra-mahjong .mj-side.e .tile, .extra-mahjong .mj-side.w .tile { font-size: 12px; }
-  .extra-mahjong .mj-dis { font-size: 10px; }
+  .extra-mahjong .mj-tile { width: 16px; height: 21px; }
+  .extra-mahjong .mj-side.e .mj-hand, .extra-mahjong .mj-side.w .mj-hand { max-height: 160px; }
+  .extra-mahjong .mj-dis .mj-tile { width: 10px; height: 13px; }
 }
-@media (prefers-reduced-motion: reduce) { .extra-mahjong .tile.new, .extra-mahjong .tile.toss { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .extra-mahjong .mj-tile.new, .extra-mahjong .mj-tile.toss { animation: none; } }
 @media (forced-colors: active) {
   .extra-mahjong button.t[aria-pressed="true"], .extra-mahjong .mj-side.turn .mj-lbl, .extra-mahjong .mj-side.win .mj-lbl {
     forced-color-adjust: none; background: Highlight; color: HighlightText;
   }
+  .extra-mahjong .mj-tile svg * { forced-color-adjust: none; fill: CanvasText; stroke: CanvasText; }
 }
 
 /* ---- Bridge: four hands around a square table, same grid pattern as .extra-mahjong
