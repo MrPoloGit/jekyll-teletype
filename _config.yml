@@ -55,8 +55,15 @@ theme_config:
   # to a full origin ("https://api.example.com") if the backend lives elsewhere,
   # and make sure that backend sends CORS headers, since the site itself is
   # static and has no server to proxy through.
+  #
+  # Left empty here on purpose: pointing production at http://127.0.0.1:5050
+  # made every visitor's own browser try to reach a server on THEIR machine,
+  # which trips Chrome's Private Network Access permission prompt and just
+  # 404s anyway since nothing is listening there. For local testing with
+  # jekyll-teletype-backend running, build with _config.dev.yml layered on
+  # top (see that file).
   api:
-    base_url: "http://127.0.0.1:5050"   # jekyll-teletype-backend, for local testing
+    base_url: ""
 
 exclude:
   - Gemfile

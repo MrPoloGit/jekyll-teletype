@@ -1,0 +1,11 @@
+# Local-only override. Layer this on top of _config.yml when running
+# jekyll-teletype-backend on your machine and you want the live counters/
+# forms on the homepage to actually hit it:
+#
+#   bundle exec jekyll serve --config _config.yml,_config.dev.yml
+#
+# Not used in production builds (the Pages Actions workflow only passes
+# _config.yml), so this never ships to visitors.
+theme_config:
+  api:
+    base_url: "http://127.0.0.1:5050"
