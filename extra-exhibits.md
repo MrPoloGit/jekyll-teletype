@@ -1,8 +1,8 @@
 ---
 layout: page
 title: Extra exhibits
-permalink: /extra-exhibit/
-description: The live-tables pattern ported to other games — see plan.md's "Future exhibits roadmap".
+permalink: /extra-exhibits
+description: The live-tables pattern ported to other games.
 extra_css:
   - /assets/css/exhibits.css
   - /assets/css/extra-exhibits.css
@@ -16,10 +16,11 @@ extra_js:
 # Extra exhibits
 
 [← Back to the main page]({{ "/" | relative_url }}){: .apply}
+[See the wizard duel →]({{ "/wizard-duel-exhibit" | relative_url }}){: .apply}
 
 Exhibit A's live-tables pattern — a board, simulated play, replay controls —
-ported to games beyond poker. See "Future exhibits roadmap" in `plan.md`:
-Mahjong, Bridge, Chess, and Go are all built.
+ported to games beyond poker: Mahjong, Bridge, Chess, and Go. The Wizard
+Duel exhibit is a separate page, not part of this one.
 
 ## Mahjong
 

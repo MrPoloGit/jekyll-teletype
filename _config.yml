@@ -62,5 +62,6 @@ exclude:
   - Gemfile
   - Gemfile.lock
   - plan.md
+  - wizard-plan.md
   - teletype.html
   - vendor

@@ -23,7 +23,7 @@ table, a hand-tree analysis view, a heads-up duel, a message trace, an
 animated dot-matrix US map, an opening-book tree, a Castle Challenge
 diagram, a thank-you card cascade) from markdown — that's ~4,000 lines of
 one-off JS/SVG, not a reusable markdown feature. They have, however, all
-been **ported** as plain HTML/CSS/JS and live on `exhibits.md` (`/exhibits/`)
+been **ported** as plain HTML/CSS/JS and live on `exhibits.md` (`/exhibits`)
 as a demonstration — see "Exhibits" below and `plan.md`'s full roadmap. If
 you want something like that on your own page, that's the pattern: write it
 as plain HTML/JS, scope its CSS/JS to just that page via `extra_css`/
@@ -249,7 +249,7 @@ without bloating every other page.
 
 ## Exhibits
 
-`exhibits.md` (`/exhibits/`) hosts animations/diagrams ported from the source
+`exhibits.md` (`/exhibits`) hosts animations/diagrams ported from the source
 page — see `plan.md`'s "Exhibits porting roadmap" for the full list and
 status. These are page-specific, not theme features: each lives in
 `assets/css/exhibits.css` / `assets/js/exhibits/<name>.js`, loaded only on

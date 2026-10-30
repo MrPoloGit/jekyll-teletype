@@ -1,8 +1,8 @@
 ---
 layout: page
 title: Exhibits
-permalink: /exhibits/
-description: Ported animations and diagrams from the source page — see plan.md's roadmap.
+permalink: /exhibits
+description: Ported animations and diagrams from the source page.
 extra_css:
   - /assets/css/exhibits.css
 extra_js:
@@ -19,10 +19,9 @@ extra_js:
 # Exhibits
 
 [← Back to the main page]({{ "/" | relative_url }}){: .apply}
-[See the extra exhibits →]({{ "/extra-exhibit/" | relative_url }}){: .apply}
+[See the extra exhibits →]({{ "/extra-exhibits" | relative_url }}){: .apply}
 
-Ported, one at a time, from the source page's bespoke animations/diagrams —
-see "Exhibits porting roadmap" in `plan.md` for the full list and status.
+Ported, one at a time, from the source page's bespoke animations/diagrams.
 These are page-specific: each one's CSS/JS is declared in this page's own
 front matter (`extra_css`/`extra_js`), not loaded site-wide.
 
@@ -40,8 +39,7 @@ on every resize, not a static image.
 
 10,000 simulated games, 8 bots each, no-limit hold'em — the whole exhibit
 below (stats, grid, featured table, action strips) is one unit, so it shares
-a single gutter number rather than numbering each internal row; see
-`plan.md` for why.
+a single gutter number rather than numbering each internal row.
 
 <section class="exhibit-a" id="exhibit" aria-label="Exhibit A: simulated live poker tables" markdown="1">
 
@@ -239,8 +237,7 @@ timed reveal.
 The tree only runs horizontally once its plate has real width (≥940px) to
 fan branches left to right — otherwise it falls back to a vertical layout.
 The figure below is wrapped in `::: wide ::: ::: ` so it can break out of
-this page's normal ~96ch text column and actually reach that width; see
-plan.md for the structural bug this fixes and why.
+this page's normal ~96ch text column and actually reach that width.
 
 <div class="exhibit-b" markdown="1">
 <div class="row">8 BOTS, NO-LIMIT HOLD'EM, BLINDS 50/100<span>SIMULATED PLAY</span></div>

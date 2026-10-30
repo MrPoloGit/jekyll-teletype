@@ -1,0 +1,35 @@
+/*
+ * Styling for the Wizard Duel exhibit (scoped to .wizard-duel). A standalone
+ * page (wizard-duel-exhibit.md), not part of extra-exhibit.md's family, but
+ * still loads assets/css/exhibits.css for the shared .row/.legend utilities
+ * documented at the top of that file. See wizard-plan.md for the mechanics
+ * this is built from, and plan.md's "Future exhibits roadmap" for how this
+ * fits alongside the other board-game exhibits.
+ *
+ * Board is drawn as SVG (checkerboard cells + piece shapes), the same
+ * reasoning as go.js: precise shape placement beats CSS grid boxes for a
+ * diagram like this. Pieces are simple, systematic shapes (star, triangle,
+ * circle, diamond, square, X) rather than bespoke per-creature art — same
+ * spirit as mahjong's pip-layout suits.
+ */
+.wizard-duel button.t {
+  font: inherit; color: inherit; background: none; border: 0; padding: 0 .5ch;
+  cursor: pointer; line-height: inherit;
+}
+.wizard-duel button.t:hover { outline: 1px solid var(--ink); outline-offset: -1px; }
+.wizard-duel button.t:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.wizard-duel button.t[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+
+.wizard-duel .wiz-fig { margin: .75em auto; max-width: 640px; }
+.wizard-duel .wiz-board { background: var(--paper); border: 1px solid var(--ink); line-height: 0; }
+.wizard-duel .wiz-svg { display: block; width: 100%; height: auto; }
+.wizard-duel .wiz-cell.a { fill: var(--paper); }
+.wizard-duel .wiz-cell.b { fill: var(--faint); }
+.wizard-duel .wiz-beam { stroke: var(--ink); stroke-width: .05; stroke-dasharray: .12 .1; }
+
+@media (max-width: 680px) { .wizard-duel .wiz-fig { max-width: 440px; } }
+@media (forced-colors: active) {
+  .wizard-duel button.t[aria-pressed="true"] { forced-color-adjust: none; background: Highlight; color: HighlightText; }
+  .wizard-duel .wiz-cell.a, .wizard-duel .wiz-cell.b { forced-color-adjust: none; fill: Canvas; }
+  .wizard-duel .wiz-beam { forced-color-adjust: none; stroke: CanvasText; }
+}
