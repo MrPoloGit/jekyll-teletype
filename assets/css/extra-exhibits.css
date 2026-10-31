@@ -232,6 +232,9 @@
    so there's nothing left to throw them out of sync. */
 .extra-go .go-stone.b { fill: var(--ink); stroke: var(--ink); stroke-width: .05; }
 .extra-go .go-stone.w { fill: var(--paper); stroke: var(--ink); stroke-width: .05; }
+/* Dashed ring on the stone just placed — same monochrome "last move"
+   marker as .extra-gomoku's .gm-stone.last/.extra-morris's .mr-pt.last. */
+.extra-go .go-stone.last { stroke: var(--ink); stroke-width: .09; stroke-dasharray: .08 .06; }
 
 @media (max-width: 680px) { .extra-go .go-fig { max-width: 400px; } }
 @media (forced-colors: active) {
@@ -239,4 +242,162 @@
   .extra-go .go-line, .extra-go .go-star { forced-color-adjust: none; stroke: CanvasText; fill: CanvasText; }
   .extra-go .go-stone.b { forced-color-adjust: none; fill: CanvasText; stroke: CanvasText; }
   .extra-go .go-stone.w { forced-color-adjust: none; fill: Canvas; stroke: CanvasText; }
+}
+
+/* ---- Checkers: an 8x8 board, English draughts (scoped to .extra-checkers) ----
+   Same grid-of-cells structure as .extra-chess (pieces sit IN squares, not
+   on lattice intersections like Go), but pieces are plain CSS circles using
+   the same solid-ink-vs-outlined-paper black/white convention as Go's
+   stones, rather than a font glyph — checkers has no standard Unicode
+   piece block the way chess does, so there was never really a "which
+   glyph block" choice to make here. */
+.extra-checkers button.t {
+  font: inherit; color: inherit; background: none; border: 0; padding: 0 .5ch;
+  cursor: pointer; line-height: inherit;
+}
+.extra-checkers button.t:hover { outline: 1px solid var(--ink); outline-offset: -1px; }
+.extra-checkers button.t:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.extra-checkers button.t[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+
+.extra-checkers .ck-fig { margin: .75em auto; max-width: 480px; }
+.extra-checkers .ck-board {
+  display: grid; grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(8, 1fr);
+  aspect-ratio: 1 / 1; border: 1px solid var(--ink);
+}
+.extra-checkers .ck-sq { display: flex; align-items: center; justify-content: center; position: relative; }
+.extra-checkers .ck-sq.lt { background: var(--paper); }
+.extra-checkers .ck-sq.dk { background: var(--faint); }
+.extra-checkers .ck-sq.from, .extra-checkers .ck-sq.to { box-shadow: inset 0 0 0 2px var(--ink); }
+
+.extra-checkers .ck-piece { display: block; width: 72%; height: 72%; border-radius: 50%; box-sizing: border-box; }
+.extra-checkers .ck-piece.b { background: var(--ink); border: 1px solid var(--ink); }
+.extra-checkers .ck-piece.w { background: var(--paper); border: 1px solid var(--ink); }
+/* King marker: a small opposite-tone dot (paper dot on a black piece, ink
+   dot on a white one) — monochrome, matching the theme, not an accent color. */
+.extra-checkers .ck-piece.king { position: relative; }
+.extra-checkers .ck-piece.king::after {
+  content: ""; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: 32%; height: 32%; border-radius: 50%;
+}
+.extra-checkers .ck-piece.b.king::after { background: var(--paper); }
+.extra-checkers .ck-piece.w.king::after { background: var(--ink); }
+
+@media (max-width: 680px) { .extra-checkers .ck-fig { max-width: 400px; } }
+@media (forced-colors: active) {
+  .extra-checkers button.t[aria-pressed="true"] { forced-color-adjust: none; background: Highlight; color: HighlightText; }
+  .extra-checkers .ck-sq.from, .extra-checkers .ck-sq.to { forced-color-adjust: none; box-shadow: inset 0 0 0 2px Highlight; }
+  .extra-checkers .ck-piece.b { forced-color-adjust: none; background: CanvasText; border-color: CanvasText; }
+  .extra-checkers .ck-piece.w { forced-color-adjust: none; background: Canvas; border-color: CanvasText; }
+  .extra-checkers .ck-piece.b.king::after { forced-color-adjust: none; background: Canvas; }
+  .extra-checkers .ck-piece.w.king::after { forced-color-adjust: none; background: CanvasText; }
+}
+
+/* ---- Gomoku: a 15x15 lattice, Five in a Row (scoped to .extra-gomoku) ----
+   Same SVG lattice-plus-intersection approach as .extra-go (lines + stones
+   at line crossings, not grid boxes), same black-solid/white-outlined
+   stone convention — just a different board size and no capture logic. */
+.extra-gomoku button.t {
+  font: inherit; color: inherit; background: none; border: 0; padding: 0 .5ch;
+  cursor: pointer; line-height: inherit;
+}
+.extra-gomoku button.t:hover { outline: 1px solid var(--ink); outline-offset: -1px; }
+.extra-gomoku button.t:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.extra-gomoku button.t[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+
+.extra-gomoku .gm-fig { margin: .75em auto; max-width: 520px; }
+.extra-gomoku .gm-board { background: var(--paper); border: 1px solid var(--ink); line-height: 0; }
+.extra-gomoku .gm-svg { display: block; width: 100%; height: auto; }
+.extra-gomoku .gm-line { stroke: var(--muted); stroke-width: .035; }
+.extra-gomoku .gm-star { fill: var(--ink); }
+.extra-gomoku .gm-stone { fill: none; stroke: none; }
+.extra-gomoku .gm-stone.b { fill: var(--ink); }
+.extra-gomoku .gm-stone.w { fill: var(--paper); stroke: var(--ink); stroke-width: .06; }
+/* Monochrome markers only (no accent color) — a thin ring on the stone
+   that was just placed, a thicker one on every stone in the winning line. */
+.extra-gomoku .gm-stone.last { stroke: var(--ink); stroke-width: .07; stroke-dasharray: .08 .06; }
+.extra-gomoku .gm-stone.win { stroke: var(--ink); stroke-width: .1; stroke-dasharray: none; }
+
+@media (max-width: 680px) { .extra-gomoku .gm-fig { max-width: 380px; } }
+@media (forced-colors: active) {
+  .extra-gomoku button.t[aria-pressed="true"] { forced-color-adjust: none; background: Highlight; color: HighlightText; }
+  .extra-gomoku .gm-line, .extra-gomoku .gm-star { forced-color-adjust: none; stroke: CanvasText; fill: CanvasText; }
+  .extra-gomoku .gm-stone.b { forced-color-adjust: none; fill: CanvasText; }
+  .extra-gomoku .gm-stone.w { forced-color-adjust: none; fill: Canvas; stroke: CanvasText; }
+  .extra-gomoku .gm-stone.win { forced-color-adjust: none; stroke: Highlight; }
+}
+
+/* ---- Blackjack: two bots and a dealer (scoped to .extra-blackjack) ----
+   Cards reuse the same `.cd` visual language as the poker exhibits/Bridge
+   (bordered box, rank+suit text) — each card exhibit defines its own
+   scoped copy rather than sharing one rule, same established convention. */
+.extra-blackjack button.t {
+  font: inherit; color: inherit; background: none; border: 0; padding: 0 .5ch;
+  cursor: pointer; line-height: inherit;
+}
+.extra-blackjack button.t:hover { outline: 1px solid var(--ink); outline-offset: -1px; }
+.extra-blackjack button.t:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.extra-blackjack button.t[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+
+.extra-blackjack .bj-fig { margin: .75em 0; display: flex; flex-wrap: wrap; gap: 1.5em; justify-content: center; }
+.extra-blackjack .bj-seat { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 10em; }
+.extra-blackjack .bj-seat.dealer { border-top: 1px solid var(--faint); padding-top: .75em; width: 100%; }
+.extra-blackjack .bj-lbl { font-size: 11px; letter-spacing: .05em; color: var(--muted); }
+.extra-blackjack .bj-hand { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; min-height: 36px; }
+.extra-blackjack .bj-total { font-size: 11px; color: var(--muted); }
+
+.extra-blackjack .cd {
+  display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
+  width: 26px; height: 36px; border: 1px solid var(--ink); border-radius: 3px;
+  background: var(--paper); box-shadow: 1px 1px 0 var(--ink);
+  font-size: 11px; font-weight: 400; line-height: 1;
+}
+.extra-blackjack .cd i { font-style: normal; font-size: 12px; }
+
+@media (max-width: 680px) {
+  .extra-blackjack .bj-fig { gap: 1em; }
+  .extra-blackjack .cd { width: 20px; height: 28px; font-size: 9px; }
+  .extra-blackjack .cd i { font-size: 10px; }
+}
+@media (forced-colors: active) {
+  .extra-blackjack button.t[aria-pressed="true"] { forced-color-adjust: none; background: Highlight; color: HighlightText; }
+}
+
+/* ---- Nine Men's Morris: 24-point custom graph, not a uniform lattice
+   (scoped to .extra-morris) ----
+   Same SVG line-plus-circle approach as .extra-go/.extra-gomoku, but since
+   the 24 valid points aren't a simple grid, every point is drawn as a
+   small hollow ring even when empty, so the legal board shape stays
+   visible rather than just floating pieces. */
+.extra-morris button.t {
+  font: inherit; color: inherit; background: none; border: 0; padding: 0 .5ch;
+  cursor: pointer; line-height: inherit;
+}
+.extra-morris button.t:hover { outline: 1px solid var(--ink); outline-offset: -1px; }
+.extra-morris button.t:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.extra-morris button.t[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+
+.extra-morris .mr-fig { margin: .75em auto; max-width: 420px; }
+.extra-morris .mr-board { background: var(--paper); border: 1px solid var(--ink); line-height: 0; }
+.extra-morris .mr-svg { display: block; width: 100%; height: auto; }
+.extra-morris .mr-line { stroke: var(--muted); stroke-width: .035; }
+.extra-morris .mr-pt { fill: var(--paper); stroke: var(--muted); stroke-width: .05; }
+.extra-morris .mr-pt.b { fill: var(--ink); stroke: var(--ink); }
+.extra-morris .mr-pt.w { fill: var(--paper); stroke: var(--ink); stroke-width: .08; }
+/* Monochrome markers only (no accent color): a dashed ring on the point
+   just placed/moved to, a dim ring on the point a piece just moved from,
+   a dashed ring with no fill on a point whose piece was just removed by a
+   mill, and a thicker solid ring on every point in a just-completed mill. */
+.extra-morris .mr-pt.last { stroke: var(--ink); stroke-width: .09; stroke-dasharray: .08 .06; }
+.extra-morris .mr-pt.from { stroke: var(--muted); stroke-width: .08; stroke-dasharray: .05 .05; }
+.extra-morris .mr-pt.removed { stroke: var(--ink); stroke-width: .06; stroke-dasharray: .04 .04; }
+.extra-morris .mr-pt.mill { stroke-width: .12; }
+
+@media (max-width: 680px) { .extra-morris .mr-fig { max-width: 320px; } }
+@media (forced-colors: active) {
+  .extra-morris button.t[aria-pressed="true"] { forced-color-adjust: none; background: Highlight; color: HighlightText; }
+  .extra-morris .mr-line { forced-color-adjust: none; stroke: CanvasText; }
+  .extra-morris .mr-pt { forced-color-adjust: none; fill: Canvas; stroke: CanvasText; }
+  .extra-morris .mr-pt.b { forced-color-adjust: none; fill: CanvasText; }
+  .extra-morris .mr-pt.w { forced-color-adjust: none; fill: Canvas; stroke: CanvasText; }
+  .extra-morris .mr-pt.mill { forced-color-adjust: none; stroke: Highlight; }
 }

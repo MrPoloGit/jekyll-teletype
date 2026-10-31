@@ -11,6 +11,10 @@ extra_js:
   - /assets/js/exhibits/bridge.js
   - /assets/js/exhibits/chess.js
   - /assets/js/exhibits/go.js
+  - /assets/js/exhibits/checkers.js
+  - /assets/js/exhibits/gomoku.js
+  - /assets/js/exhibits/blackjack.js
+  - /assets/js/exhibits/morris.js
 ---
 
 # Extra exhibits
@@ -19,8 +23,9 @@ extra_js:
 [See the wizard duel →]({{ "/wizard-duel-exhibit" | relative_url }}){: .apply}
 
 Exhibit A's live-tables pattern — a board, simulated play, replay controls —
-ported to games beyond poker: Mahjong, Bridge, Chess, and Go. The Wizard
-Duel exhibit is a separate page, not part of this one.
+ported to games beyond poker: Mahjong, Bridge, Chess, Go, Checkers, Gomoku,
+Blackjack, and Nine Men's Morris. The Wizard Duel exhibit is a separate
+page, not part of this one.
 
 ## Mahjong
 
@@ -165,5 +170,142 @@ SPEED
 </figure>
 
 <p class="legend" id="go-result">—</p>
+
+</section>
+
+## Checkers
+
+Two simulated bots play standard English draughts on an 8×8 board, 12
+pieces each, same board shape as the chess exhibit but with the
+black/white disc convention from Go's stones. Captures are mandatory
+whenever available, and a capturing piece must keep jumping as long as
+another capture is immediately available (multi-jump chains); a man
+promotes to a king on reaching the opponent's back row. A side with no
+legal move loses, and the board resets into a new game. Bot play is a
+simple random choice among forced captures (or legal moves when none are
+forced) — not real strategy, see `checkers.js`.
+
+<section class="extra-checkers" id="ck" aria-label="Checkers: two simulated bots play English draughts" markdown="1">
+
+<div class="row">8×8 BOARD, 12 PIECES EACH, MANDATORY CAPTURES<span>SIMULATED PLAY</span></div>
+
+<div class="row">TURN <span id="ck-turn">0</span><span id="ck-side">BLACK'S TURN</span></div>
+
+<div class="row"><span id="ck-move">—</span><span>
+<button class="t" id="ck-back" aria-label="Previous turn">[&lt;]</button><button class="t" id="ck-play" aria-label="Pause">[PAUSE]</button><button class="t" id="ck-next" aria-label="Next turn">[&gt;]</button>
+SPEED
+<button class="t" data-speed="1" aria-pressed="false">1x</button><button class="t" data-speed="4" aria-pressed="false">4x</button><button class="t" data-speed="8" aria-pressed="true">8x</button><button class="t" data-speed="16" aria-pressed="false">16x</button>
+</span></div>
+
+<div class="row">PIECES<span><span id="ck-count-b">BLACK 12</span>&nbsp;&nbsp;<span id="ck-count-w">WHITE 12</span></span></div>
+
+<figure class="ck-fig" id="ck-fig" aria-label="8 by 8 checkers board">
+<div class="ck-board" id="ck-board"></div>
+</figure>
+
+<p class="legend" id="ck-result">English draughts, mandatory captures, two bots.</p>
+
+</section>
+
+## Gomoku
+
+Two simulated bots take turns placing a stone on a 15×15 lattice — same
+board rendering as the Go exhibit (lines and stones on intersections, not
+grid boxes), much simpler rules: whoever gets 5 in a row first (any
+direction) wins, no captures or liberties involved. The bots aren't
+playing randomly — each checks for an immediate win, then an immediate
+block, before falling back to a random nearby cell — but it's still just
+that one-step lookahead, not real strategy; see `gomoku.js`. A full board
+with no winner is a draw. Either way, the board resets into a new game.
+
+<section class="extra-gomoku" id="gm" aria-label="Gomoku: two simulated bots play Five in a Row" markdown="1">
+
+<div class="row">15×15 BOARD, FIVE IN A ROW TO WIN<span>SIMULATED PLAY</span></div>
+
+<div class="row">MOVE <span id="gm-move">0</span><span id="gm-side">BLACK TO MOVE</span></div>
+
+<div class="row"><span></span><span>
+<button class="t" id="gm-back" aria-label="Previous move">[&lt;]</button><button class="t" id="gm-play" aria-label="Pause">[PAUSE]</button><button class="t" id="gm-next" aria-label="Next move">[&gt;]</button>
+SPEED
+<button class="t" data-speed="1" aria-pressed="false">1x</button><button class="t" data-speed="4" aria-pressed="false">4x</button><button class="t" data-speed="8" aria-pressed="true">8x</button><button class="t" data-speed="16" aria-pressed="false">16x</button>
+</span></div>
+
+<figure class="gm-fig" id="gm-fig" aria-label="15 by 15 Gomoku board">
+<div class="gm-board" id="gm-board"></div>
+</figure>
+
+<p class="legend" id="gm-result">Gomoku (Five in a Row), simple block/win lookahead, two bots.</p>
+
+</section>
+
+## Blackjack
+
+Two bot players and a dealer play one round at a time from a standard
+52-card deck, reshuffled fresh every round — the simplest card game here,
+reusing the same `.cd` card look as the poker exhibits and Bridge. Real
+rules: aces count 11 unless that busts the hand; a two-card 21
+(blackjack) beats a dealer 21 reached with more cards, and blackjack vs.
+blackjack is a push; the dealer stands on any 17 or higher. Bots hit below
+17 and stand at 17+ — a single fixed threshold, not real strategy. Every
+hand, including the dealer's, stays face-up the whole round rather than
+hiding a hole card, the same legibility trade-off Bridge already makes.
+
+<section class="extra-blackjack" id="bj" aria-label="Blackjack: two bot players and a dealer play one round at a time" markdown="1">
+
+<div class="row">2 BOT PLAYERS, STANDARD 52-CARD DECK, ONE ROUND AT A TIME<span>SIMULATED PLAY</span></div>
+
+<div class="row">ROUND <span id="bj-round">0</span><span id="bj-status">—</span></div>
+
+<div class="row"><span></span><span>
+<button class="t" id="bj-back" aria-label="Previous step">[&lt;]</button><button class="t" id="bj-play" aria-label="Pause">[PAUSE]</button><button class="t" id="bj-next" aria-label="Next step">[&gt;]</button>
+SPEED
+<button class="t" data-speed="1" aria-pressed="false">1x</button><button class="t" data-speed="4" aria-pressed="false">4x</button><button class="t" data-speed="8" aria-pressed="true">8x</button><button class="t" data-speed="16" aria-pressed="false">16x</button>
+</span></div>
+
+<figure class="bj-fig" aria-label="Two bot players and a dealer">
+<div class="bj-seat"><div class="bj-lbl">BOT A</div><div class="bj-hand" id="bj-hand-a"></div><div class="bj-total" id="bj-total-a">BOT A 0</div></div>
+<div class="bj-seat"><div class="bj-lbl">BOT B</div><div class="bj-hand" id="bj-hand-b"></div><div class="bj-total" id="bj-total-b">BOT B 0</div></div>
+<div class="bj-seat dealer"><div class="bj-lbl">DEALER</div><div class="bj-hand" id="bj-hand-d"></div><div class="bj-total" id="bj-total-d">DEALER 0</div></div>
+</figure>
+
+<p class="legend" id="bj-result">Standard rules, bots hit below 17 and stand at 17+ — not real strategy.</p>
+
+</section>
+
+## Nine Men's Morris
+
+Two simulated bots play a full game on the traditional board: three nested
+squares, 24 points total, each side's 4 corners and 4 edge-midpoints
+joined around the ring, and the midpoints also joined straight through to
+the matching midpoint of the next ring in (corners never get that radial
+line) — 32 edges, 16 possible "mills" (3 points in an unbroken line).
+Real rules, both phases: placement — each side places all 9 pieces one at
+a time, alternating, and completing a mill removes one of the opponent's
+pieces (never one of their own mills unless every piece they have is in
+one); movement — once all 18 pieces are down, each turn slides one piece
+to an adjacent empty point, with the same mill-and-remove rule, and a side
+down to exactly 3 pieces may "fly" to any empty point rather than only an
+adjacent one. A side wins by reducing the opponent below 3 pieces, or by
+leaving them with no legal move. Bots use the same one-step win-now /
+block-now / random lookahead as every other exhibit's "AI" — see
+`morris.js`.
+
+<section class="extra-morris" id="mr" aria-label="Nine Men's Morris: two simulated bots play a full game" markdown="1">
+
+<div class="row">24-POINT BOARD, 9 PIECES EACH, PLACE THEN MOVE<span>SIMULATED PLAY</span></div>
+
+<div class="row">TURN <span id="mr-turn">0</span><span id="mr-side">PLACEMENT — BLACK TO MOVE</span></div>
+
+<div class="row"><span></span><span>
+<button class="t" id="mr-back" aria-label="Previous turn">[&lt;]</button><button class="t" id="mr-play" aria-label="Pause">[PAUSE]</button><button class="t" id="mr-next" aria-label="Next turn">[&gt;]</button>
+SPEED
+<button class="t" data-speed="1" aria-pressed="false">1x</button><button class="t" data-speed="4" aria-pressed="false">4x</button><button class="t" data-speed="8" aria-pressed="true">8x</button><button class="t" data-speed="16" aria-pressed="false">16x</button>
+</span></div>
+
+<figure class="mr-fig" id="mr-fig" aria-label="Nine Men's Morris board, three nested squares">
+<div class="mr-board" id="mr-board"></div>
+</figure>
+
+<p class="legend" id="mr-result">Nine Men's Morris, simple win/block lookahead, two bots. 9 black, 9 white in reserve.</p>
 
 </section>

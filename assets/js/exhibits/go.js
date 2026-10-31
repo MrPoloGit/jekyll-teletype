@@ -239,6 +239,10 @@ C[Time used: B: 2h, W: 2h+2x60s]
     // branch to render.
     const e = events[step - 1];
     renderBoard(e.boardAfter);
+    // Dashed ring on the stone just placed, same marker as gomoku.js's
+    // "last" class — renderBoard above already rebuilt every point's class
+    // string from scratch, so no previous "last" needs clearing first.
+    if (!e.pass) { const lastEl = ptEls[key(e.col, e.row)]; if (lastEl) lastEl.classList.add("last"); }
     $("go-move").textContent = step;
     $("go-turn").textContent = e.color === "b" ? "WHITE TO MOVE" : "BLACK TO MOVE";
     $("go-last").textContent = (e.color === "b" ? "B " : "W ") + (e.pass ? "PASS" : coordName(e.col, e.row));
